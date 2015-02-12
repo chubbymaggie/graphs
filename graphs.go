@@ -63,12 +63,32 @@ func NewSubGraph(graph *dot.Graph) (*SubGraph, error) {
 	return sub, nil
 }
 
+// Search tries to locate an isomorphism of sub in graph. If successful it
+// returns the mapping from sub node index to graph node index of the first
+// isomorphism located. The boolean value is true if such a mapping could be
+// located, and false otherwise.
+func Search(graph *dot.Graph, sub *SubGraph) (m map[int]int, ok bool) {
+	for _, node := range graph.Nodes.Nodes {
+		m, ok = Isomorphism(graph, node.Index, sub)
+		if ok {
+			return m, true
+		}
+	}
+	return nil, false
+}
+
 // Isomorphism returns a mapping from sub node index to graph node index if
 // there exists an isomorphism of sub in graph (starting at the entry node
 // index). The boolean value is true if such a mapping could be located, and
 // false otherwise.
 func Isomorphism(graph *dot.Graph, entry int, sub *SubGraph) (m map[int]int, ok bool) {
-	panic("not yet implemented.")
+	m = make(map[int]int)
+	g := graph.Nodes.Nodes[entry]
+	s := sub.Graph.Nodes.Nodes[sub.entry]
+	if isIsomorphism(g, s, graph, sub, m) {
+		return m, true
+	}
+	return nil, false
 }
 
 // isIsomorphism returns true if g is an isomorphism of s, where g is a node of
@@ -171,12 +191,4 @@ func isIsomorphism(g, s *dot.Node, graph *dot.Graph, sub *SubGraph, m map[int]in
 
 	// Match found!
 	return true
-}
-
-// Search tries to locate an isomorphism of sub in graph. If successful it
-// returns the mapping from sub node index to graph node index of the first
-// isomorphism located. The boolean value is true if such a mapping could be
-// located, and false otherwise.
-func Search(graph *dot.Graph, sub *SubGraph) (m map[int]int, ok bool) {
-	panic("not yet implemented.")
 }
