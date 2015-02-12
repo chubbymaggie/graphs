@@ -60,3 +60,19 @@ func NewSubGraph(graph *dot.Graph) (*SubGraph, error) {
 
 	return sub, nil
 }
+
+// Isomorph returns a mapping from sub node index to graph node index if there
+// exists an isomorphism of sub in graph (starting at the entry node index). The
+// boolean value is true if such a mapping could be located, and false
+// otherwise.
+func Isomorph(graph *dot.Graph, entry int, sub *SubGraph) (m map[int]int, ok bool) {
+	panic("not yet implemented.")
+}
+
+// Search tries to locate an isomorphism of sub in graph. If successful it
+// returns the mapping from sub node index to graph node index of the first
+// isomorphism located. The boolean value is true if such a mapping could be
+// located, and false otherwise.
+func Search(graph *dot.Graph, sub *SubGraph) (m map[int]int, ok bool) {
+	panic("not yet implemented.")
+}
