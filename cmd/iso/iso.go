@@ -23,7 +23,7 @@ func init() {
 }
 
 const use = `
-Usage: iso GRAPH.dot SUB.dot
+Usage: iso [OPTION]... SUB.dot GRAPH.dot
 Locates isomorphisms of the subgraph SUB in GRAPH.
 
 Flags:`
@@ -39,15 +39,15 @@ func main() {
 		flag.Usage()
 		os.Exit(1)
 	}
-	graphPath, subPath := flag.Arg(0), flag.Arg(1)
+	subPath, graphPath := flag.Arg(0), flag.Arg(1)
 	err := iso(graphPath, subPath)
 	if err != nil {
 		log.Fatalln(err)
 	}
 }
 
-// iso parses the provided graph and subgraph and tries to locate isomorphisms
-// of the subgraph in the graph.
+// iso parses the provided graphs and tries to locate isomorphisms of the
+// subgraph in the graph.
 func iso(graphPath, subPath string) error {
 	// Parse graphs.
 	graph, err := parseGraph(graphPath)
