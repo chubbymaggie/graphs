@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"sort"
 
 	"github.com/mewfork/dot"
 	"github.com/mewkiz/pkg/errutil"
@@ -66,7 +67,7 @@ func iso(graphPath, subPath string) error {
 			m, ok := graphs.Isomorphism(graph, entry, sub)
 			if ok {
 				found = true
-				fmt.Println("FOUND:", nodes[entry], "m:", m)
+				printMapping(graph, sub, m)
 			}
 		}
 	} else {
@@ -74,7 +75,7 @@ func iso(graphPath, subPath string) error {
 		m, ok := graphs.Search(graph, sub)
 		if ok {
 			found = true
-			fmt.Println("FOUND:", nodes[m[sub.Entry()]], "m:", m)
+			printMapping(graph, sub, m)
 		}
 	}
 	if !found {
@@ -82,6 +83,22 @@ func iso(graphPath, subPath string) error {
 	}
 
 	return nil
+}
+
+// printMapping prints the mapping from sub node index to graph node index for
+// an isomorphism of sub in graph.
+func printMapping(graph *dot.Graph, sub *graphs.SubGraph, m map[int]int) {
+	gnodes, snodes := graph.Nodes.Nodes, sub.Nodes.Nodes
+	entry := m[sub.Entry()]
+	var sidxs []int
+	for sidx := range m {
+		sidxs = append(sidxs, sidx)
+	}
+	sort.Ints(sidxs)
+	fmt.Printf("Isomorphism found at node %q:\n", gnodes[entry].Name)
+	for _, sidx := range sidxs {
+		fmt.Printf("   %q=%q\n", snodes[sidx].Name, gnodes[m[sidx]].Name)
+	}
 }
 
 // parseGraph parses the provided DOT file into a graph.

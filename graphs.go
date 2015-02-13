@@ -2,8 +2,6 @@
 package graphs
 
 import (
-	"fmt"
-
 	"github.com/mewfork/dot"
 	"github.com/mewkiz/pkg/errutil"
 )
@@ -33,7 +31,8 @@ func NewSubGraph(graph *dot.Graph) (*SubGraph, error) {
 
 	// Locate entry and exit nodes.
 	var hasEntry, hasExit bool
-	for _, node := range graph.Nodes.Nodes {
+	gnodes, snodes := graph.Nodes.Nodes, sub.Nodes.Nodes
+	for _, node := range gnodes {
 		label, ok := node.Attrs["label"]
 		if !ok {
 			continue
@@ -41,13 +40,13 @@ func NewSubGraph(graph *dot.Graph) (*SubGraph, error) {
 		switch label {
 		case "entry":
 			if hasEntry {
-				return nil, errutil.Newf(`redefinition of "entry" node; previous name (%v), new name (%v)`, sub.Nodes.Nodes[sub.entry], graph.Nodes.Nodes[node.Index])
+				return nil, errutil.Newf(`redefinition of node with "entry" label; previous node %q, new node %q`, snodes[sub.entry].Name, gnodes[node.Index].Name)
 			}
 			sub.entry = node.Index
 			hasEntry = true
 		case "exit":
 			if hasExit {
-				return nil, errutil.Newf(`redefinition of "exit" node; previous name (%d), new name (%d)`, sub.Nodes.Nodes[sub.exit], graph.Nodes.Nodes[node.Index])
+				return nil, errutil.Newf(`redefinition of node with "exit" label; previous node %q, new node %q`, snodes[sub.exit].Name, gnodes[node.Index].Name)
 			}
 			sub.exit = node.Index
 			hasExit = true
@@ -94,7 +93,7 @@ func Search(graph *dot.Graph, sub *SubGraph) (m map[int]int, ok bool) {
 func Isomorphism(graph *dot.Graph, entry int, sub *SubGraph) (m map[int]int, ok bool) {
 	m = make(map[int]int)
 	g := graph.Nodes.Nodes[entry]
-	s := sub.Graph.Nodes.Nodes[sub.entry]
+	s := sub.Nodes.Nodes[sub.entry]
 	if isIsomorphism(g, s, graph, sub, m) {
 		return m, true
 	}
@@ -108,15 +107,13 @@ func Isomorphism(graph *dot.Graph, entry int, sub *SubGraph) (m map[int]int, ok 
 func isIsomorphism(g, s *dot.Node, graph *dot.Graph, sub *SubGraph, m map[int]int) bool {
 	// TODO: Check for loops?
 	// TODO: Check for duplicate val in m and only add if not already present.
-	fmt.Println("s.Index:", s.Index)
-	fmt.Println("m:", m)
 
 	// Create mapping from sub node index to graph node index by trying possible
 	// candidates.
-	if len(m) != len(sub.Nodes.Nodes) {
+	gnodes, snodes := graph.Nodes.Nodes, sub.Nodes.Nodes
+	if len(m) != len(snodes) {
 		if s.Index == sub.entry {
 			// Add mapping for entry node.
-			fmt.Println("ENTRY:", s.Index)
 			if _, ok := m[s.Index]; ok {
 				// TODO: How are graphs with entry points having outgoing edges to
 				// themselves handled?
@@ -136,9 +133,7 @@ func isIsomorphism(g, s *dot.Node, graph *dot.Graph, sub *SubGraph, m map[int]in
 				return false
 			}
 			for _, ssucc := range s.Succs {
-				fmt.Println("ssucc:", ssucc.Index)
 				for _, gsucc := range g.Succs {
-					fmt.Println("gsucc:", gsucc.Index)
 					if _, ok := m[ssucc.Index]; !ok {
 						m[ssucc.Index] = gsucc.Index
 					}
@@ -152,13 +147,13 @@ func isIsomorphism(g, s *dot.Node, graph *dot.Graph, sub *SubGraph, m map[int]in
 	}
 
 	// Complete mapping?
-	if len(m) != len(sub.Nodes.Nodes) {
+	if len(m) != len(snodes) {
 		return false
 	}
 
 	// Check if m correctly maps the nodes of sub onto the nodes of graph.
 	for sidx, gidx := range m {
-		snode, gnode := sub.Nodes.Nodes[sidx], graph.Nodes.Nodes[gidx]
+		snode, gnode := snodes[sidx], gnodes[gidx]
 
 		// Check predecessors.
 		if snode.Index != sub.entry {
