@@ -41,26 +41,36 @@ func NewSubGraph(graph *dot.Graph) (*SubGraph, error) {
 		switch label {
 		case "entry":
 			if hasEntry {
-				return nil, errutil.Newf("redefinition of entry node; previous index (%d), new index (%d)", sub.entry, node.Index)
+				return nil, errutil.Newf(`redefinition of "entry" node; previous name (%v), new name (%v)`, sub.Nodes.Nodes[sub.entry], graph.Nodes.Nodes[node.Index])
 			}
 			sub.entry = node.Index
 			hasEntry = true
 		case "exit":
 			if hasExit {
-				return nil, errutil.Newf("redefinition of exit node; previous index (%d), new index (%d)", sub.exit, node.Index)
+				return nil, errutil.Newf(`redefinition of "exit" node; previous name (%d), new name (%d)`, sub.Nodes.Nodes[sub.exit], graph.Nodes.Nodes[node.Index])
 			}
 			sub.exit = node.Index
 			hasExit = true
 		}
 	}
 	if !hasEntry {
-		return nil, errutil.New("unable to locate entry node")
+		return nil, errutil.New(`unable to locate node with "entry" label`)
 	}
 	if !hasExit {
-		return nil, errutil.New("unable to locate exit node")
+		return nil, errutil.New(`unable to locate node with "exit" label`)
 	}
 
 	return sub, nil
+}
+
+// Entry returns the entry node index in the subgraph.
+func (sub *SubGraph) Entry() int {
+	return sub.entry
+}
+
+// Exit returns the exit node index in the subgraph.
+func (sub *SubGraph) Exit() int {
+	return sub.exit
 }
 
 // Search tries to locate an isomorphism of sub in graph. If successful it
@@ -68,8 +78,8 @@ func NewSubGraph(graph *dot.Graph) (*SubGraph, error) {
 // isomorphism located. The boolean value is true if such a mapping could be
 // located, and false otherwise.
 func Search(graph *dot.Graph, sub *SubGraph) (m map[int]int, ok bool) {
-	for _, node := range graph.Nodes.Nodes {
-		m, ok = Isomorphism(graph, node.Index, sub)
+	for entry := 0; entry < len(graph.Nodes.Nodes); entry++ {
+		m, ok = Isomorphism(graph, entry, sub)
 		if ok {
 			return m, true
 		}
