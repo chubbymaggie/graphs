@@ -20,12 +20,15 @@ var (
 	// When flagAll is true, merge all isomorphisms of the subgraph in the graph
 	// to single nodes.
 	flagAll bool
+	// When flagImage is true, generate an image representation of the CFG.
+	flagImage bool
 	// When flagQuiet is true, suppress non-error messages.
 	flagQuiet bool
 )
 
 func init() {
 	flag.BoolVar(&flagAll, "all", true, "Merge all isomorphisms of SUB in GRAPH to single nodes.")
+	flag.BoolVar(&flagImage, "img", false, "Generate an image representation of the CFG.")
 	flag.BoolVar(&flagQuiet, "q", false, "Suppress non-error messages.")
 	flag.Usage = usage
 }
@@ -115,16 +118,18 @@ func dump(graph *dot.Graph, name string) error {
 	}
 
 	// Generate an image representation of the graph.
-	pngPath := name + ".png"
-	if !flagQuiet {
-		log.Printf("Creating: %q\n", pngPath)
-	}
-	cmd := exec.Command("dot", "-Tpng", "-o", pngPath, dotPath)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	err = cmd.Run()
-	if err != nil {
-		return errutil.Err(err)
+	if flagImage {
+		pngPath := name + ".png"
+		if !flagQuiet {
+			log.Printf("Creating: %q\n", pngPath)
+		}
+		cmd := exec.Command("dot", "-Tpng", "-o", pngPath, dotPath)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		err = cmd.Run()
+		if err != nil {
+			return errutil.Err(err)
+		}
 	}
 
 	return nil
