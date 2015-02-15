@@ -107,6 +107,7 @@ func Isomorphism(graph *dot.Graph, entry int, sub *SubGraph) (m map[int]int, ok 
 func isIsomorphism(g, s *dot.Node, graph *dot.Graph, sub *SubGraph, m map[int]int) bool {
 	// TODO: Check for loops?
 	// TODO: Check for duplicate val in m and only add if not already present.
+	// TODO: Take edge labels (e.g. conditional branches) into account?
 
 	// Create mapping from sub node index to graph node index by trying possible
 	// candidates.
