@@ -1,4 +1,4 @@
-digraph while {
+digraph list {
 	A [label="entry"]
 	B [label="exit"]
 	A->B
