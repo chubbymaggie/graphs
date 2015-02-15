@@ -92,6 +92,8 @@ func merge(graphPath, subPath string) error {
 		}
 	}
 
+	// TODO: Consider using os.Exit codes to signal that a subgraph was
+	// successfully located and merged. This would enable loops in bash scripts.
 	if found {
 		err = dump(graph, "out")
 		if err != nil {

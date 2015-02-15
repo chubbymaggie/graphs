@@ -1,0 +1,5 @@
+digraph while {
+	A [label="entry"]
+	B [label="exit"]
+	A->B
+}
