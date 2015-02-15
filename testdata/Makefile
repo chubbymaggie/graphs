@@ -3,5 +3,3 @@ prepare:
 	clang -S -emit-llvm -o c4.ll c4.c
 	opt -mem2reg -S -o c4.ll c4.ll
 	ll2dot -f -img c4.ll
-	rm -f c4.ll
-	rm -f c4.c

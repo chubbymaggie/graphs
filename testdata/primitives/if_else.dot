@@ -1,0 +1,10 @@
+digraph if_else {
+	A [label="entry"]
+	B
+	C
+	D [label="exit"]
+	A->B [label="true"]
+	A->C [label="false"]
+	B->D
+	C->D
+}
