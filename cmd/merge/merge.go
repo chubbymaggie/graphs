@@ -13,29 +13,33 @@ import (
 
 	"github.com/mewfork/dot"
 	"github.com/mewkiz/pkg/errutil"
+	"github.com/mewkiz/pkg/pathutil"
 	"github.com/mewrev/graphs"
 )
 
 var (
-	// When flagAll is true, merge all isomorphisms of the subgraph in the graph
-	// to single nodes.
-	flagAll bool
 	// When flagImage is true, generate an image representation of the CFG.
 	flagImage bool
+	// flagOut specifies the output path of the graph.
+	flagOut string
 	// When flagQuiet is true, suppress non-error messages.
 	flagQuiet bool
+	// When flagStart is a non-empty string, merge an isomorphism of the subgraph
+	// in the graph which starts at the given node.
+	flagStart string
 )
 
 func init() {
-	flag.BoolVar(&flagAll, "all", true, "Merge all isomorphisms of SUB in GRAPH to single nodes.")
 	flag.BoolVar(&flagImage, "img", false, "Generate an image representation of the CFG.")
+	flag.StringVar(&flagOut, "o", "out.dot", "Output path of the graph.")
 	flag.BoolVar(&flagQuiet, "q", false, "Suppress non-error messages.")
+	flag.StringVar(&flagStart, "start", "", "Merge an isomorphism of SUB in GRAPH which starts at the given node.")
 	flag.Usage = usage
 }
 
 const use = `
 Usage: merge [OPTION]... SUB.dot GRAPH.dot
-Merges isomorphisms of the subgraph SUB in GRAPH to single nodes.
+Merges isomorphisms of the subgraph SUB in GRAPH into single nodes.
 
 Flags:`
 
@@ -61,56 +65,106 @@ func main() {
 // subgraph in the graph into single nodes.
 func merge(graphPath, subPath string) error {
 	// Parse graphs.
-	graph, err := parseGraph(graphPath)
+	graph, err := dot.ParseFile(graphPath)
 	if err != nil {
 		return errutil.Err(err)
 	}
-	sub, err := parseSubGraph(subPath)
+	sub, err := graphs.ParseSubGraph(subPath)
 	if err != nil {
 		return errutil.Err(err)
 	}
 
-	// Merge isomorphisms of subgraph in graph into single nodes.
+	// Merge isomorphisms.
 	found := false
-	for entry := 0; entry < len(graph.Nodes.Nodes); entry++ {
-		m, ok := graphs.Isomorphism(graph, entry, sub)
-		if !ok {
-			continue
+	if len(flagStart) > 0 {
+		// Merge an isomorphism of sub in graph which starts at the node
+		// specified by the "-start" flag.
+		m, ok := graphs.Isomorphism(graph, flagStart, sub)
+		if ok {
+			found = true
+			printMapping(graph, sub, m)
 		}
-		found = true
-		printMapping(graph, sub, m)
-
-		entry, exit := graph.Nodes.Nodes[m[sub.Entry()]], graph.Nodes.Nodes[m[sub.Exit()]]
-		err = graph.Merge(entry, exit, uniqName(sub.Name))
+		err := replace(graph, m, sub)
 		if err != nil {
-			return err
+			return errutil.Err(err)
 		}
-
-		// Break after first merge.
-		if !flagAll {
-			break
-		}
-	}
-
-	// TODO: Consider using os.Exit codes to signal that a subgraph was
-	// successfully located and merged. This would enable loops in bash scripts.
-	if found {
-		err = dump(graph, "out")
+		err = dump(graph)
 		if err != nil {
 			return errutil.Err(err)
 		}
 	} else {
-		fmt.Println("SUB not present in GRAPH.")
+		// Merge all isomorphisms of sub in graph.
+		for {
+			m, ok := graphs.Search(graph, sub)
+			if !ok {
+				break
+			}
+			found = true
+			printMapping(graph, sub, m)
+			err := replace(graph, m, sub)
+			if err != nil {
+				return errutil.Err(err)
+			}
+			err = dump(graph)
+			if err != nil {
+				return errutil.Err(err)
+			}
+		}
+	}
+	if !found {
+		fmt.Println("not found.")
 	}
 
 	return nil
 }
 
+// printMapping prints the mapping from sub node name to graph node name for an
+// isomorphism of sub in graph.
+func printMapping(graph *dot.Graph, sub *graphs.SubGraph, m map[string]string) {
+	entry := m[sub.Entry()]
+	var snames []string
+	for sname := range m {
+		snames = append(snames, sname)
+	}
+	sort.Strings(snames)
+	fmt.Printf("Isomorphism found at node %q:\n", entry)
+	for _, sname := range snames {
+		fmt.Printf("   %q=%q\n", sname, m[sname])
+	}
+}
+
+// replace replaces the nodes of the isomorphism of sub in graph with a single
+// node.
+func replace(graph *dot.Graph, m map[string]string, sub *graphs.SubGraph) error {
+	var nodes []*dot.Node
+	for _, gname := range m {
+		node, ok := graph.Nodes.Lookup[gname]
+		if !ok {
+			return errutil.Newf("unable to locate mapping for node %q", gname)
+		}
+		nodes = append(nodes, node)
+	}
+	name := uniqName(graph, sub.Name)
+	entry, ok := graph.Nodes.Lookup[m[sub.Entry()]]
+	if !ok {
+		return errutil.Newf("unable to locate mapping for entry node %q", sub.Entry())
+	}
+	exit, ok := graph.Nodes.Lookup[m[sub.Exit()]]
+	if !ok {
+		return errutil.Newf("unable to locate mapping for exit node %q", sub.Exit())
+	}
+	err := graph.Replace(nodes, name, entry, exit)
+	if err != nil {
+		return errutil.Err(err)
+	}
+	return nil
+}
+
 // dump stores the graph as a DOT file and an image representation of the graph
-// as a PNG file with filenames based on the given name.
-func dump(graph *dot.Graph, name string) error {
+// as a PNG file with filenames based on "-o" flag.
+func dump(graph *dot.Graph) error {
 	// Store graph to DOT file.
-	dotPath := name + ".dot"
+	dotPath := flagOut
 	if !flagQuiet {
 		log.Printf("Creating: %q\n", dotPath)
 	}
@@ -121,7 +175,7 @@ func dump(graph *dot.Graph, name string) error {
 
 	// Generate an image representation of the graph.
 	if flagImage {
-		pngPath := name + ".png"
+		pngPath := pathutil.TrimExt(dotPath) + ".png"
 		if !flagQuiet {
 			log.Printf("Creating: %q\n", pngPath)
 		}
@@ -137,61 +191,13 @@ func dump(graph *dot.Graph, name string) error {
 	return nil
 }
 
-// uniq maps from name to the next unused numeric suffix.
-var uniq = make(map[string]int)
-
 // uniqName returns name with a uniq numeric suffix.
-func uniqName(name string) string {
-	id := uniq[name]
-	uniq[name]++
-	return fmt.Sprintf("%s%d", name, id)
-}
-
-// printMapping prints the mapping from sub node index to graph node index for
-// an isomorphism of sub in graph.
-func printMapping(graph *dot.Graph, sub *graphs.SubGraph, m map[int]int) {
-	gnodes, snodes := graph.Nodes.Nodes, sub.Nodes.Nodes
-	entry := m[sub.Entry()]
-	var sidxs []int
-	for sidx := range m {
-		sidxs = append(sidxs, sidx)
+func uniqName(graph *dot.Graph, name string) string {
+	for id := 0; ; id++ {
+		s := fmt.Sprintf("%s%d", name, id)
+		_, ok := graph.Nodes.Lookup[s]
+		if !ok {
+			return s
+		}
 	}
-	sort.Ints(sidxs)
-	fmt.Printf("Isomorphism found at node %q:\n", gnodes[entry].Name)
-	for _, sidx := range sidxs {
-		fmt.Printf("   %q=%q\n", snodes[sidx].Name, gnodes[m[sidx]].Name)
-	}
-}
-
-// parseGraph parses the provided DOT file into a graph.
-func parseGraph(path string) (*dot.Graph, error) {
-	buf, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil, errutil.Err(err)
-	}
-	graph, err := dot.Read(buf)
-	if err != nil {
-		return nil, errutil.Err(err)
-	}
-	return graph, nil
-}
-
-// parseSubGraph parses the provided DOT file into a subgraph with a dedicated
-// entry and exit node. The entry and exit nodes are identified using the node
-// "label" attribute, e.g.
-//
-//    digraph if {
-//       A->B [label="true"]
-//       A->C [label="false"]
-//       B->C
-//       A [label="entry"]
-//       B
-//       C [label="exit"]
-//    }
-func parseSubGraph(path string) (*graphs.SubGraph, error) {
-	graph, err := parseGraph(path)
-	if err != nil {
-		return nil, errutil.Err(err)
-	}
-	return graphs.NewSubGraph(graph)
 }

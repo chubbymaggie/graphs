@@ -3,6 +3,7 @@ package graphs
 
 import (
 	"log"
+	"sort"
 
 	"github.com/mewfork/dot"
 	"github.com/mewkiz/pkg/errutil"
@@ -98,8 +99,13 @@ func (sub *SubGraph) Exit() string {
 // isomorphism located. The boolean value is true if such a mapping could be
 // located, and false otherwise.
 func Search(graph *dot.Graph, sub *SubGraph) (m map[string]string, ok bool) {
-	for _, node := range graph.Nodes.Nodes {
-		m, ok = Isomorphism(graph, node.Name, sub)
+	var names []string
+	for name := range graph.Nodes.Lookup {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	for _, name := range names {
+		m, ok = Isomorphism(graph, name, sub)
 		if ok {
 			return m, true
 		}
