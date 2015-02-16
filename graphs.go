@@ -92,22 +92,31 @@ func Search(graph *dot.Graph, sub *SubGraph) (m map[int]int, ok bool) {
 // false otherwise.
 func Isomorphism(graph *dot.Graph, entry int, sub *SubGraph) (m map[int]int, ok bool) {
 	m = make(map[int]int)
+	visited := make(map[pair]bool)
 	g := graph.Nodes.Nodes[entry]
 	s := sub.Nodes.Nodes[sub.entry]
-	if isIsomorphism(g, s, graph, sub, m) {
+	if isIsomorphism(g, s, graph, sub, m, visited) {
 		return m, true
 	}
 	return nil, false
+}
+
+// pair is a key-value pair.
+type pair struct {
+	key, val int
 }
 
 // isIsomorphism returns true if g is an isomorphism of s, where g is a node of
 // graph, s is a node of sub and m is a mapping from sub node index to graph
 // node index. Incoming edges to entry and outgoing edges from exit are ignored
 // when searching for isomorphisms of sub.
-func isIsomorphism(g, s *dot.Node, graph *dot.Graph, sub *SubGraph, m map[int]int) bool {
+func isIsomorphism(g, s *dot.Node, graph *dot.Graph, sub *SubGraph, m map[int]int, visited map[pair]bool) bool {
 	// TODO: Check for loops?
 	// TODO: Check for duplicate val in m and only add if not already present.
 	// TODO: Take edge labels (e.g. conditional branches) into account?
+
+	// HACK: the visited map is used to prevent cycles. Find a cleaner solution
+	// and remove visited entirely!
 
 	// Create mapping from sub node index to graph node index by trying possible
 	// candidates.
@@ -115,12 +124,11 @@ func isIsomorphism(g, s *dot.Node, graph *dot.Graph, sub *SubGraph, m map[int]in
 	if len(m) != len(snodes) {
 		if s.Index == sub.entry {
 			// Add mapping for entry node.
-			if _, ok := m[s.Index]; ok {
+			if _, ok := m[s.Index]; !ok {
 				// TODO: How are graphs with entry points having outgoing edges to
 				// themselves handled?
-				panic("should only arrive here once")
+				m[s.Index] = g.Index
 			}
-			m[s.Index] = g.Index
 		} else {
 			// Verify predecessor count.
 			if len(s.Preds) != len(g.Preds) {
@@ -138,7 +146,12 @@ func isIsomorphism(g, s *dot.Node, graph *dot.Graph, sub *SubGraph, m map[int]in
 					if _, ok := m[ssucc.Index]; !ok {
 						m[ssucc.Index] = gsucc.Index
 					}
-					if isIsomorphism(gsucc, ssucc, graph, sub, m) {
+					pair := pair{key: ssucc.Index, val: gsucc.Index}
+					if visited[pair] {
+						continue
+					}
+					visited[pair] = true
+					if isIsomorphism(gsucc, ssucc, graph, sub, m, visited) {
 						return true
 					}
 					delete(m, ssucc.Index)
