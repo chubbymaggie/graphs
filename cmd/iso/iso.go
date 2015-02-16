@@ -4,7 +4,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"sort"
@@ -14,18 +13,12 @@ import (
 	"github.com/mewrev/graphs"
 )
 
-var (
-	// When flagAll is true, locate all isomorphisms of the subgraph in the
-	// graph.
-	flagAll bool
-	// flagEntry specifies the starting point (e.g. entry node) of the search in
-	// graph.
-	flagEntry string
-)
+// When flagStart is a non-empty string, locate an isomorphism of the subgraph
+// in the graph which starts at the given node.
+var flagStart string
 
 func init() {
-	flag.BoolVar(&flagAll, "all", true, "Locate all isomorphisms of SUB in GRAPH.")
-	flag.StringVar(&flagEntry, "entry", "", "Locate isomorphism of SUB in GRAPH starting at entry.")
+	flag.StringVar(&flagStart, "start", "", "Locate an isomorphism of SUB in GRAPH which starts at the given node.")
 	flag.Usage = usage
 }
 
@@ -57,44 +50,41 @@ func main() {
 // subgraph in the graph.
 func iso(graphPath, subPath string) error {
 	// Parse graphs.
-	graph, err := parseGraph(graphPath)
+	graph, err := dot.ParseFile(graphPath)
 	if err != nil {
 		return errutil.Err(err)
 	}
-	sub, err := parseSubGraph(subPath)
+	sub, err := graphs.ParseSubGraph(subPath)
 	if err != nil {
 		return errutil.Err(err)
 	}
 
-	// Locate isomorphism of subgraph in graph starting at entry.
+	// Locate isomorphisms.
 	found := false
-	if len(flagEntry) > 0 {
-		entry, ok := graph.Nodes.Lookup[flagEntry]
-		if !ok {
-			return errutil.Newf("unable to locate entry node %q", flagEntry)
-		}
-		m, ok := graphs.Isomorphism(graph, entry.Index, sub)
+	if len(flagStart) > 0 {
+		// Locate an isomorphism of sub in graph which starts at the node
+		// specified by the "-start" flag.
+		m, ok := graphs.Isomorphism(graph, flagStart, sub)
 		if ok {
 			found = true
 			printMapping(graph, sub, m)
 		}
 	} else {
-		// Locate isomorphisms of subgraph in graph.
-		for entry := 0; entry < len(graph.Nodes.Nodes); entry++ {
-			m, ok := graphs.Isomorphism(graph, entry, sub)
+		// Locate all isomorphisms of sub in graph.
+		var names []string
+		for name := range graph.Nodes.Lookup {
+			names = append(names, name)
+		}
+		sort.Strings(names)
+		for _, name := range names {
+			m, ok := graphs.Isomorphism(graph, name, sub)
 			if !ok {
 				continue
 			}
 			found = true
 			printMapping(graph, sub, m)
-
-			// Break after the first isomorphism has been located.
-			if !flagAll {
-				break
-			}
 		}
 	}
-
 	if !found {
 		fmt.Println("not found.")
 	}
@@ -102,51 +92,17 @@ func iso(graphPath, subPath string) error {
 	return nil
 }
 
-// printMapping prints the mapping from sub node index to graph node index for
-// an isomorphism of sub in graph.
-func printMapping(graph *dot.Graph, sub *graphs.SubGraph, m map[int]int) {
-	gnodes, snodes := graph.Nodes.Nodes, sub.Nodes.Nodes
+// printMapping prints the mapping from sub node name to graph node name for an
+// isomorphism of sub in graph.
+func printMapping(graph *dot.Graph, sub *graphs.SubGraph, m map[string]string) {
 	entry := m[sub.Entry()]
-	var sidxs []int
-	for sidx := range m {
-		sidxs = append(sidxs, sidx)
+	var snames []string
+	for sname := range m {
+		snames = append(snames, sname)
 	}
-	sort.Ints(sidxs)
-	fmt.Printf("Isomorphism found at node %q:\n", gnodes[entry].Name)
-	for _, sidx := range sidxs {
-		fmt.Printf("   %q=%q\n", snodes[sidx].Name, gnodes[m[sidx]].Name)
+	sort.Strings(snames)
+	fmt.Printf("Isomorphism found at node %q:\n", entry)
+	for _, sname := range snames {
+		fmt.Printf("   %q=%q\n", sname, m[sname])
 	}
-}
-
-// parseGraph parses the provided DOT file into a graph.
-func parseGraph(path string) (*dot.Graph, error) {
-	buf, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil, errutil.Err(err)
-	}
-	graph, err := dot.Read(buf)
-	if err != nil {
-		return nil, errutil.Err(err)
-	}
-	return graph, nil
-}
-
-// parseSubGraph parses the provided DOT file into a subgraph with a dedicated
-// entry and exit node. The entry and exit nodes are identified using the node
-// "label" attribute, e.g.
-//
-//    digraph if {
-//       A->B [label="true"]
-//       A->C [label="false"]
-//       B->C
-//       A [label="entry"]
-//       B
-//       C [label="exit"]
-//    }
-func parseSubGraph(path string) (*graphs.SubGraph, error) {
-	graph, err := parseGraph(path)
-	if err != nil {
-		return nil, errutil.Err(err)
-	}
-	return graphs.NewSubGraph(graph)
 }
