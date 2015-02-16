@@ -1,7 +1,5 @@
 digraph list {
 	A [label="entry"]
-	B
-	C [label="exit"]
+	B [label="exit"]
 	A->B
-	B->C
 }
