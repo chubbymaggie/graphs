@@ -88,10 +88,6 @@ func merge(graphPath, subPath string) error {
 		if err != nil {
 			return errutil.Err(err)
 		}
-		err = dump(graph)
-		if err != nil {
-			return errutil.Err(err)
-		}
 	} else {
 		// Merge all isomorphisms of sub in graph.
 		for {
@@ -105,13 +101,16 @@ func merge(graphPath, subPath string) error {
 			if err != nil {
 				return errutil.Err(err)
 			}
-			err = dump(graph)
-			if err != nil {
-				return errutil.Err(err)
-			}
 		}
 	}
-	if !found {
+
+	// Store DOT and PNG representation of graph.
+	if found {
+		err = dump(graph)
+		if err != nil {
+			return errutil.Err(err)
+		}
+	} else {
 		fmt.Println("not found.")
 	}
 
