@@ -14,11 +14,18 @@ import (
 	"github.com/mewrev/graphs"
 )
 
-// When flagAll is true, locate all isomorphisms of the subgraph in the graph.
-var flagAll bool
+var (
+	// When flagAll is true, locate all isomorphisms of the subgraph in the
+	// graph.
+	flagAll bool
+	// flagEntry specifies the starting point (e.g. entry node) of the search in
+	// graph.
+	flagEntry string
+)
 
 func init() {
 	flag.BoolVar(&flagAll, "all", true, "Locate all isomorphisms of SUB in GRAPH.")
+	flag.StringVar(&flagEntry, "entry", "", "Locate isomorphism of SUB in GRAPH starting at entry.")
 	flag.Usage = usage
 }
 
@@ -58,26 +65,36 @@ func iso(graphPath, subPath string) error {
 	if err != nil {
 		return errutil.Err(err)
 	}
-	nodes := graph.Nodes.Nodes
 
+	// Locate isomorphism of subgraph in graph starting at entry.
 	found := false
-	if flagAll {
-		// Locate all isomorphisms of subgraph in graph.
-		for entry := 0; entry < len(nodes); entry++ {
-			m, ok := graphs.Isomorphism(graph, entry, sub)
-			if ok {
-				found = true
-				printMapping(graph, sub, m)
-			}
+	if len(flagEntry) > 0 {
+		entry, ok := graph.Nodes.Lookup[flagEntry]
+		if !ok {
+			return errutil.Newf("unable to locate entry node %q", flagEntry)
 		}
-	} else {
-		// Locate the first isomorphism of subgraph in graph.
-		m, ok := graphs.Search(graph, sub)
+		m, ok := graphs.Isomorphism(graph, entry.Index, sub)
 		if ok {
 			found = true
 			printMapping(graph, sub, m)
 		}
+	} else {
+		// Locate isomorphisms of subgraph in graph.
+		for entry := 0; entry < len(graph.Nodes.Nodes); entry++ {
+			m, ok := graphs.Isomorphism(graph, entry, sub)
+			if !ok {
+				continue
+			}
+			found = true
+			printMapping(graph, sub, m)
+
+			// Break after the first isomorphism has been located.
+			if !flagAll {
+				break
+			}
+		}
 	}
+
 	if !found {
 		fmt.Println("not found.")
 	}
