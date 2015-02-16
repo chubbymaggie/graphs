@@ -1,6 +1,8 @@
 digraph while {
 	A [label="entry"]
-	B [label="exit"]
-	A->A [label="true"]
-	A->B [label="false"]
+	B
+	C [label="exit"]
+	A->B [label="true"]
+	B->A
+	A->C [label="false"]
 }
