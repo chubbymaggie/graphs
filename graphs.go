@@ -175,11 +175,9 @@ func isIsomorphism(g, s *dot.Node, graph *dot.Graph, sub *SubGraph, m map[string
 			if len(s.Succs) != len(g.Succs) {
 				return false
 			}
-			for _, ssucc := range s.Succs {
-				for _, gsucc := range g.Succs {
-					if _, ok := m[ssucc.Name]; !ok {
-						m[ssucc.Name] = gsucc.Name
-					}
+			for _, ssucc := range sortNodes(s.Succs) {
+				for _, gsucc := range sortNodes(g.Succs) {
+					m[ssucc.Name] = gsucc.Name
 					pair := pair{key: ssucc.Name, val: gsucc.Name}
 					if visited[pair] {
 						continue
@@ -188,7 +186,6 @@ func isIsomorphism(g, s *dot.Node, graph *dot.Graph, sub *SubGraph, m map[string
 					if isIsomorphism(gsucc, ssucc, graph, sub, m, visited) {
 						return true
 					}
-					delete(m, ssucc.Name)
 				}
 			}
 		}
@@ -253,4 +250,25 @@ func isIsomorphism(g, s *dot.Node, graph *dot.Graph, sub *SubGraph, m map[string
 
 	// Match found!
 	return true
+}
+
+func sortNodes(nodes []*dot.Node) []*dot.Node {
+	ns := make([]*dot.Node, len(nodes))
+	copy(ns, nodes)
+	sort.Sort(sort.Reverse(sortNames(ns)))
+	return ns
+}
+
+type sortNames []*dot.Node
+
+func (nodes sortNames) Len() int {
+	return len(nodes)
+}
+
+func (nodes sortNames) Less(i, j int) bool {
+	return nodes[i].Name < nodes[j].Name
+}
+
+func (nodes sortNames) Swap(i, j int) {
+	nodes[i], nodes[j] = nodes[j], nodes[i]
 }
