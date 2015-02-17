@@ -2,6 +2,7 @@
 package graphs
 
 import (
+	"fmt"
 	"log"
 	"sort"
 
@@ -119,7 +120,7 @@ func Search(graph *dot.Graph, sub *SubGraph) (m map[string]string, ok bool) {
 // otherwise.
 func Isomorphism(graph *dot.Graph, entry string, sub *SubGraph) (m map[string]string, ok bool) {
 	m = make(map[string]string)
-	visited := make(map[pair]bool)
+	visited := make(map[string]bool)
 	g, ok := graph.Nodes.Lookup[entry]
 	if !ok {
 		log.Printf("graphs.Isomorphism: unable to locate entry node %q in graph.\n", entry)
@@ -136,16 +137,11 @@ func Isomorphism(graph *dot.Graph, entry string, sub *SubGraph) (m map[string]st
 	return nil, false
 }
 
-// pair is a key-value pair.
-type pair struct {
-	key, val string
-}
-
 // isIsomorphism returns true if g is an isomorphism of s, where g is a node of
 // graph, s is a node of sub and m is a mapping from sub node name to graph node
 // name. Incoming edges to entry and outgoing edges from exit are ignored when
 // searching for isomorphisms of sub.
-func isIsomorphism(g, s *dot.Node, graph *dot.Graph, sub *SubGraph, m map[string]string, visited map[pair]bool) bool {
+func isIsomorphism(g, s *dot.Node, graph *dot.Graph, sub *SubGraph, m map[string]string, visited map[string]bool) bool {
 	// TODO: Check for loops?
 	// TODO: Check for duplicate val in m and only add if not already present.
 	// TODO: Take edge labels (e.g. conditional branches) into account?
@@ -178,11 +174,12 @@ func isIsomorphism(g, s *dot.Node, graph *dot.Graph, sub *SubGraph, m map[string
 			for _, ssucc := range sortNodes(s.Succs) {
 				for _, gsucc := range sortNodes(g.Succs) {
 					m[ssucc.Name] = gsucc.Name
-					pair := pair{key: ssucc.Name, val: gsucc.Name}
-					if visited[pair] {
+					key := sorted(m)
+					if visited[key] {
+						log.Println("already visited:", key)
 						continue
 					}
-					visited[pair] = true
+					visited[key] = true
 					if isIsomorphism(gsucc, ssucc, graph, sub, m, visited) {
 						return true
 					}
@@ -256,6 +253,7 @@ func sortNodes(nodes []*dot.Node) []*dot.Node {
 	ns := make([]*dot.Node, len(nodes))
 	copy(ns, nodes)
 	sort.Sort(sort.Reverse(sortNames(ns)))
+	//sort.Sort(sortNames(ns))
 	return ns
 }
 
@@ -271,4 +269,18 @@ func (nodes sortNames) Less(i, j int) bool {
 
 func (nodes sortNames) Swap(i, j int) {
 	nodes[i], nodes[j] = nodes[j], nodes[i]
+}
+
+func sorted(m map[string]string) string {
+	var keys []string
+	for key := range m {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	var s string
+	for _, key := range keys {
+		s += fmt.Sprintf("%q:%q, ", key, m[key])
+	}
+	return s
+
 }
