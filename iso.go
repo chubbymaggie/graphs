@@ -30,6 +30,9 @@ func valid(graph *dot.Graph, sub *SubGraph, m map[string]string) bool {
 
 		// Verify predecessors.
 		if s.Name != sub.entry {
+			if len(s.Preds) != len(g.Preds) {
+				return false
+			}
 			for _, spred := range s.Preds {
 				found := false
 				for _, gpred := range g.Preds {
@@ -46,6 +49,9 @@ func valid(graph *dot.Graph, sub *SubGraph, m map[string]string) bool {
 
 		// Verify successors.
 		if s.Name != sub.exit {
+			if len(s.Succs) != len(g.Succs) {
+				return false
+			}
 			for _, ssucc := range s.Succs {
 				found := false
 				for _, gsucc := range g.Succs {
