@@ -114,11 +114,14 @@ func Search(graph *dot.Graph, sub *SubGraph) (m map[string]string, ok bool) {
 	return nil, false
 }
 
+/**
 // Isomorphism returns a mapping from sub node name to graph node name if there
-// exists an isomorphism of sub in graph (starting at the entry node). The
+// exists an isomorphism of sub in graph which starts at the entry node. The
 // boolean value is true if such a mapping could be located, and false
 // otherwise.
 func Isomorphism(graph *dot.Graph, entry string, sub *SubGraph) (m map[string]string, ok bool) {
+	return brute(graph, entry, sub)
+
 	m = make(map[string]string)
 	visited := make(map[string]bool)
 	g, ok := graph.Nodes.Lookup[entry]
@@ -136,6 +139,7 @@ func Isomorphism(graph *dot.Graph, entry string, sub *SubGraph) (m map[string]st
 	}
 	return nil, false
 }
+*/
 
 // isIsomorphism returns true if g is an isomorphism of s, where g is a node of
 // graph, s is a node of sub and m is a mapping from sub node name to graph node
