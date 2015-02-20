@@ -29,11 +29,7 @@ func Candidates(graph *dot.Graph, entry string, sub *SubGraph) map[string]map[st
 		log.Println(err)
 		return nil
 	}
-	c := map[string]map[string]bool{
-		sub.entry: {
-			entry: true,
-		},
-	}
+	c := make(map[string]map[string]bool)
 	locate(s, g, sub, c)
 	if len(c) != len(sub.Nodes.Nodes) {
 		err := errutil.Newf("incomplete mapping; expected %d map entities, got %d", len(sub.Nodes.Nodes), len(c))
@@ -55,16 +51,23 @@ func locate(g, s *dot.Node, sub *SubGraph, c map[string]map[string]bool) {
 		return
 	}
 
-	// Add g as a sub node name candidate.
-	if s.Name != sub.entry {
-		_, ok := c[s.Name]
-		if !ok {
-			c[s.Name] = make(map[string]bool)
+	// Prevent infinite cycles.
+	if _, ok := c[s.Name]; ok {
+		if c[s.Name][g.Name] {
+			log.Printf("already visited (%q=%q)\n", s.Name, g.Name)
+			return
 		}
+	}
+
+	// Add node pair candidate. Add entry node pair exactly once.
+	if _, ok := c[s.Name]; !ok {
+		c[s.Name] = map[string]bool{
+			g.Name: true,
+		}
+	} else if s.Name != sub.entry {
 		c[s.Name][g.Name] = true
 	}
 
-	// TODO: Prevent inf cycles.
 	for _, ssucc := range s.Succs {
 		for _, gsucc := range g.Succs {
 			locate(gsucc, ssucc, sub, c)
@@ -90,4 +93,81 @@ func isPotential(g, s *dot.Node, sub *SubGraph) bool {
 	}
 
 	return true
+}
+
+// Solve returns a mapping from sub node name to graph node name for an
+// isomorphism of sub in graph based on the given node pair candidates.
+func Solve(graph *dot.Graph, sub *SubGraph, c map[string]map[string]bool) (map[string]string, error) {
+	// Sanity check.
+	if len(c) != len(sub.Nodes.Nodes) {
+		return nil, errutil.Newf("incomplete mapping; expected %d map entities, got %d", len(sub.Nodes.Nodes), len(c))
+	}
+
+	m := make(map[string]string)
+
+	for {
+		// Locate unique node pairs.
+		err := solveUniqPair(c, m)
+		if err != nil {
+			return nil, errutil.Err(err)
+		}
+
+		if len(m) == len(sub.Nodes.Nodes) {
+			break
+		}
+	}
+
+	return m, nil
+}
+
+// solveUniqPair tries to locate a unique node pair in c. If successful the node
+// pair is removed from c and stored in m. As the graph node name of the node
+// pair is no longer a valid candidate it is removed from all other node pairs
+// in c.
+func solveUniqPair(c map[string]map[string]bool, m map[string]string) error {
+	for sname, candidates := range c {
+		if len(candidates) != 1 {
+			continue
+		}
+
+		gname := pop(candidates)
+		if contains(m, gname) {
+			return errutil.Newf("invalid mapping; sub node %q and %q both map to graph node %q", m[sname], sname, gname)
+		}
+
+		// Move unique node pair from c to m.
+		m[sname] = gname
+		delete(c, sname)
+
+		// Remove graph node name of the unique node pair from all other node
+		// pairs in c.
+		for _, candidates := range c {
+			delete(candidates, gname)
+		}
+
+		return nil
+	}
+
+	return errutil.New("unable to locate a unique node pair")
+}
+
+// contains returns true if m contains the value val, and false otherwise.
+func contains(m map[string]string, val string) bool {
+	for _, x := range m {
+		if x == val {
+			return true
+		}
+	}
+	return false
+}
+
+// pop returns the only key in m.
+func pop(m map[string]bool) string {
+	if len(m) != 1 {
+		panic(fmt.Sprintf("invalid map length; expected 1, got %d", len(m)))
+	}
+	for key := range m {
+		return key
+	}
+	panic("unreachable")
 }
