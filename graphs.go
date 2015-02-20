@@ -256,8 +256,8 @@ func isIsomorphism(g, s *dot.Node, graph *dot.Graph, sub *SubGraph, m map[string
 func sortNodes(nodes []*dot.Node) []*dot.Node {
 	ns := make([]*dot.Node, len(nodes))
 	copy(ns, nodes)
-	sort.Sort(sort.Reverse(sortNames(ns)))
-	//sort.Sort(sortNames(ns))
+	//sort.Sort(sort.Reverse(sortNames(ns)))
+	sort.Sort(sortNames(ns))
 	return ns
 }
 

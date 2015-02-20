@@ -135,7 +135,7 @@ func find(g, s *dot.Node, graph *dot.Graph, sub *SubGraph, c map[string]string, 
 		return
 	}
 
-	if s.Name == sub.Name {
+	if s.Name == sub.entry {
 		if _, ok := c[s.Name]; !ok {
 			c[s.Name] = g.Name
 		}
