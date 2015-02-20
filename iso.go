@@ -180,6 +180,7 @@ func find(g, s *dot.Node, graph *dot.Graph, sub *SubGraph, c map[string]string, 
 	}
 }
 
+// enc deterministically encodes the given map into a string.
 func enc(m map[string]string) string {
 	var keys []string
 	for key := range m {
