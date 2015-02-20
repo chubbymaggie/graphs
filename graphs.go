@@ -1,4 +1,4 @@
-// Package graphs implements subgraph isomorphism search algorithms.
+// Package graphs provides subgraph data structures.
 package graphs
 
 import (
