@@ -16,6 +16,12 @@ func valid(graph *dot.Graph, sub *SubGraph, m map[string]string) bool {
 	if len(m) != len(sub.Nodes.Nodes) {
 		return false
 	}
+
+	// Check for duplicate values.
+	if hasDup(m) {
+		return false
+	}
+
 	for sname, gname := range m {
 		s, ok := sub.Nodes.Lookup[sname]
 		if !ok {
@@ -71,6 +77,18 @@ func valid(graph *dot.Graph, sub *SubGraph, m map[string]string) bool {
 
 	// Isomorphism found!
 	return true
+}
+
+// hasDup returns true if m contains a duplicate value.
+func hasDup(m map[string]string) bool {
+	vals := make(map[string]bool, len(m))
+	for _, v := range m {
+		if vals[v] {
+			return true
+		}
+		vals[v] = true
+	}
+	return false
 }
 
 // Isomorphism returns a mapping from sub node name to graph node name if there
@@ -153,8 +171,8 @@ func find(g, s *dot.Node, graph *dot.Graph, sub *SubGraph, c map[string]string, 
 		if len(s.Succs) != len(g.Succs) {
 			return
 		}
-		for _, ssucc := range s.Succs {
-			for _, gsucc := range g.Succs {
+		for _, ssucc := range sortNodes(s.Succs) {
+			for _, gsucc := range sortNodes(g.Succs) {
 				find(gsucc, ssucc, graph, sub, c, out, visited)
 			}
 		}
