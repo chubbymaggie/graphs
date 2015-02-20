@@ -30,7 +30,7 @@ func Candidates(graph *dot.Graph, entry string, sub *SubGraph) map[string]map[st
 		return nil
 	}
 	c := make(map[string]map[string]bool)
-	locate(s, g, sub, c)
+	locate(g, s, sub, c)
 	if len(c) != len(sub.Nodes.Nodes) {
 		err := errutil.Newf("incomplete mapping; expected %d map entities, got %d", len(sub.Nodes.Nodes), len(c))
 		log.Println(err)
@@ -104,20 +104,24 @@ func Solve(graph *dot.Graph, sub *SubGraph, c map[string]map[string]bool) (map[s
 	}
 
 	m := make(map[string]string)
-
 	for {
 		// Locate unique node pairs.
 		err := solveUniqPair(c, m)
 		if err != nil {
+			if len(c) > 0 {
+				fmt.Println("~~~ [ map ] ~~~")
+				spew.Dump(m)
+				fmt.Println("~~~ [ needs attention ] ~~~")
+				spew.Dump(c)
+				panic("foo")
+			}
 			return nil, errutil.Err(err)
 		}
 
-		if len(m) == len(sub.Nodes.Nodes) {
-			break
+		if valid(graph, sub, m) {
+			return m, nil
 		}
 	}
-
-	return m, nil
 }
 
 // solveUniqPair tries to locate a unique node pair in c. If successful the node
