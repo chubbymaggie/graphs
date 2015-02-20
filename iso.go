@@ -150,6 +150,7 @@ func find(g, s *dot.Node, graph *dot.Graph, sub *SubGraph, c map[string]string, 
 		log.Println("already visited.")
 		return
 	}
+	visited[enc(c)] = true
 
 	// Validate candidate mapping.
 	if len(c) == len(sub.Nodes.Nodes) {
