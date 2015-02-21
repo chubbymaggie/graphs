@@ -19,6 +19,26 @@ type Equation struct {
 	m map[string]string
 }
 
+// Dup returns a copy of eq.
+func (eq *Equation) Dup() *Equation {
+	// Duplicate node pair candidates.
+	c := make(map[string]map[string]bool)
+	for sname, candidates := range eq.c {
+		c[sname] = make(map[string]bool)
+		for gname, val := range candidates {
+			c[sname][gname] = val
+		}
+	}
+
+	// Duplicate node pairs.
+	m := make(map[string]string)
+	for sname, gname := range eq.m {
+		m[sname] = gname
+	}
+
+	return &Equation{c: c, m: m}
+}
+
 // TODO: Remove the C and M methods.
 func (eq *Equation) C() map[string]map[string]bool { return eq.c }
 func (eq *Equation) M() map[string]string          { return eq.m }
@@ -99,16 +119,20 @@ func (eq *Equation) Solve(graph *dot.Graph, sub *graphs.SubGraph) error {
 
 	for {
 		// Locate unique node pairs.
-		err := eq.SolveUnique()
+		ok, err := eq.SolveUnique()
 		if err != nil {
-			if len(eq.c) > 0 {
-				fmt.Println("~~~ [ map ] ~~~")
-				spew.Dump(eq.m)
-				fmt.Println("~~~ [ needs attention ] ~~~")
-				spew.Dump(eq.c)
-				panic("foo")
-			}
 			return errutil.Err(err)
+		}
+		if ok {
+			continue
+		}
+
+		if len(eq.c) > 0 {
+			fmt.Println("~~~ [ map ] ~~~")
+			spew.Dump(eq.m)
+			fmt.Println("~~~ [ needs attention ] ~~~")
+			spew.Dump(eq.c)
+			panic("foo")
 		}
 
 		if eq.IsSolved(graph, sub) {
@@ -121,15 +145,19 @@ func (eq *Equation) Solve(graph *dot.Graph, sub *graphs.SubGraph) error {
 // pair is removed from c and stored in m. As the graph node name of the node
 // pair is no longer a valid candidate it is removed from all other node pairs
 // in c.
-func (eq *Equation) SolveUnique() error {
+func (eq *Equation) SolveUnique() (ok bool, err error) {
 	for sname, candidates := range eq.c {
 		if len(candidates) == 1 {
 			gname := pop(candidates)
-			return eq.SetPair(sname, gname)
+			err := eq.SetPair(sname, gname)
+			if err != nil {
+				return false, err
+			}
+			return true, nil
 		}
 	}
 
-	return errutil.New("unable to locate a unique node pair")
+	return false, nil
 }
 
 // SetPair marks the given node pair as known by removing it from c and storing
