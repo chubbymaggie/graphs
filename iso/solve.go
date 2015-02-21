@@ -123,40 +123,31 @@ func (eq *Equation) Solve(graph *dot.Graph, sub *graphs.SubGraph) error {
 	spew.Dump(m)
 
 	return nil
-
-	panic("bar")
-
-	for !eq.IsSolved(graph, sub) {
-		// Locate unique node pairs.
-		ok, err := eq.SolveUnique()
-		if err != nil {
-			return errutil.Err(err)
-		}
-		if ok {
-			continue
-		}
-
-		// TODO: Remove debug output.
-		if len(eq.c) > 0 {
-			fmt.Println("~~~ [ map ] ~~~")
-			spew.Dump(eq.m)
-			fmt.Println("~~~ [ needs attention ] ~~~")
-			spew.Dump(eq.c)
-		}
-
-		// Locate the easiest node pair by brute force.
-		err = eq.SolveBrute(graph, sub)
-		if err != nil {
-			return errutil.Err(err)
-		}
-	}
-
-	return nil
 }
 
+// solve tries to locate a mapping from sub node name to graph node name for an
+// isomorphism of sub in graph based on the given node pair candidates. A valid
+// mapping is sent to the out channel if successful, and a nil mapping
+// otherwise.
 func (eq *Equation) solve(graph *dot.Graph, sub *graphs.SubGraph, out chan map[string]string) {
 	for !eq.IsSolved(graph, sub) {
+		// No candidates left.
+		if len(eq.c) == 0 {
+			out <- nil
+			return
+		}
+
 		// Locate unique node pairs.
+		fmt.Println("___ [ before unique pairs ] _________")
+		fmt.Println()
+		fmt.Println("candidate mapping:")
+		fmt.Println()
+		spew.Dump(eq.c)
+		fmt.Println()
+		fmt.Println("mapping:")
+		fmt.Println()
+		spew.Dump(eq.m)
+		fmt.Println()
 		ok, err := eq.SolveUnique()
 		if err != nil {
 			log.Println(errutil.Err(err))
@@ -167,7 +158,18 @@ func (eq *Equation) solve(graph *dot.Graph, sub *graphs.SubGraph, out chan map[s
 			continue
 		}
 
-		// Locate the easiest node pair to solve by brute force.
+		fmt.Println("___ [ before brute ] _________")
+		fmt.Println()
+		fmt.Println("candidate mapping:")
+		fmt.Println()
+		spew.Dump(eq.c)
+		fmt.Println()
+		fmt.Println("mapping:")
+		fmt.Println()
+		spew.Dump(eq.m)
+		fmt.Println()
+
+		// Locate the easiest node pair by brute force.
 		sname, err := eq.easiest()
 		if err != nil {
 			log.Println(errutil.Err(err))
@@ -176,10 +178,15 @@ func (eq *Equation) solve(graph *dot.Graph, sub *graphs.SubGraph, out chan map[s
 		}
 		candidates := eq.c[sname]
 
+		fmt.Println("^^^ brute ^^^")
+		fmt.Println()
+
 		// Try each node pair candidate.
 		ncandidates := len(candidates)
 		in := make(chan map[string]string)
 		for gname := range candidates {
+			fmt.Println("gname:", gname, "sname:", sname)
+			fmt.Println()
 			go func(eq *Equation, gname string) {
 				err := eq.SetPair(sname, gname)
 				if err != nil {
