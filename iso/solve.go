@@ -4,6 +4,7 @@ package iso
 import (
 	"fmt"
 	"log"
+	"sync"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/mewfork/dot"
@@ -112,12 +113,20 @@ func (eq *Equation) findCandidates(g, s *dot.Node, sub *graphs.SubGraph) {
 // Solve tries to locate a mapping from sub node name to graph node name for an
 // isomorphism of sub in graph based on the given node pair candidates.
 func (eq *Equation) Solve(graph *dot.Graph, sub *graphs.SubGraph) error {
-	// Sanity check.
-	if len(eq.c) != len(sub.Nodes.Nodes) {
-		return errutil.Newf("incomplete candidate mapping; expected %d map entites, got %d", len(sub.Nodes.Nodes), len(eq.c))
+	out := make(chan map[string]string)
+	go eq.solve(graph, sub, out)
+	m := <-out
+	if m == nil {
+		return errutil.New("unable to solve node pair equation")
 	}
+	fmt.Println("@@@ [ mapping found ] @@@@@@@@@@@@@@@@")
+	spew.Dump(m)
 
-	for {
+	return nil
+
+	panic("bar")
+
+	for !eq.IsSolved(graph, sub) {
 		// Locate unique node pairs.
 		ok, err := eq.SolveUnique()
 		if err != nil {
@@ -127,18 +136,127 @@ func (eq *Equation) Solve(graph *dot.Graph, sub *graphs.SubGraph) error {
 			continue
 		}
 
+		// TODO: Remove debug output.
 		if len(eq.c) > 0 {
 			fmt.Println("~~~ [ map ] ~~~")
 			spew.Dump(eq.m)
 			fmt.Println("~~~ [ needs attention ] ~~~")
 			spew.Dump(eq.c)
-			panic("foo")
 		}
 
-		if eq.IsSolved(graph, sub) {
-			return nil
+		// Locate the easiest node pair by brute force.
+		err = eq.SolveBrute(graph, sub)
+		if err != nil {
+			return errutil.Err(err)
 		}
 	}
+
+	return nil
+}
+
+func (eq *Equation) solve(graph *dot.Graph, sub *graphs.SubGraph, out chan map[string]string) {
+	for !eq.IsSolved(graph, sub) {
+		// Locate unique node pairs.
+		ok, err := eq.SolveUnique()
+		if err != nil {
+			log.Println(errutil.Err(err))
+			out <- nil
+			return
+		}
+		if ok {
+			continue
+		}
+
+		// Locate the easiest node pair to solve by brute force.
+		sname, err := eq.easiest()
+		if err != nil {
+			log.Println(errutil.Err(err))
+			out <- nil
+			return
+		}
+		candidates := eq.c[sname]
+
+		// Try each node pair candidate.
+		ncandidates := len(candidates)
+		in := make(chan map[string]string)
+		for gname := range candidates {
+			go func(eq *Equation, gname string) {
+				err := eq.SetPair(sname, gname)
+				if err != nil {
+					log.Println(errutil.Err(err))
+				}
+				eq.solve(graph, sub, in)
+			}(eq.Dup(), gname)
+		}
+		var m map[string]string
+		for i := 0; i < ncandidates; i++ {
+			if m != nil {
+				m = <-in
+			} else {
+				<-in
+			}
+		}
+		out <- m
+		if m != nil {
+			return
+		}
+	}
+
+	out <- eq.m
+}
+
+// SolveBrute tries to solve the easiest node pair (i.e. the one with the fewest
+// number of candidates) of the equation by brute force.
+func (eq *Equation) SolveBrute(graph *dot.Graph, sub *graphs.SubGraph) error {
+	// Locate the easiest node pair to solve.
+	sname, err := eq.easiest()
+	if err != nil {
+		return errutil.Err(err)
+	}
+	candidates := eq.c[sname]
+
+	// Try each node pair candidate.
+	wg := new(sync.WaitGroup)
+	wg.Add(len(candidates))
+	out := make(chan map[string]string)
+	for gname := range candidates {
+		go brute(graph, sub, eq.Dup(), sname, gname, wg, out)
+	}
+	wg.Wait()
+
+	return nil
+}
+
+func brute(graph *dot.Graph, sub *graphs.SubGraph, eq *Equation, sname, gname string, wg *sync.WaitGroup, out chan map[string]string) {
+	fmt.Println("trying to solve eq with:", gname)
+	err := eq.SetPair(sname, gname)
+	if err != nil {
+		log.Println(errutil.Err(err))
+	}
+	if len(eq.c) == 0 {
+		out <- nil
+	}
+	if eq.IsSolved(graph, sub) {
+		out <- eq.m
+	}
+	wg.Done()
+}
+
+// easiest returns the sub node name of the easiest node pair (i.e. the one with
+// the fewest number of candidates) to solve.
+func (eq *Equation) easiest() (string, error) {
+	min := -1
+	var easiest string
+	for sname, candidates := range eq.c {
+		if min == -1 || len(candidates) < min {
+			min = len(candidates)
+			easiest = sname
+		}
+	}
+	if min < 2 {
+		return "", errutil.Newf("too few candidates for brute force; expected > 2, got %d", min)
+	}
+	return easiest, nil
 }
 
 // SolveUnique tries to locate a unique node pair in c. If successful the node
@@ -151,7 +269,7 @@ func (eq *Equation) SolveUnique() (ok bool, err error) {
 			gname := pop(candidates)
 			err := eq.SetPair(sname, gname)
 			if err != nil {
-				return false, err
+				return false, errutil.Err(err)
 			}
 			return true, nil
 		}
