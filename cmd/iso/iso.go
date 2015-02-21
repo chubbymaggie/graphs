@@ -11,6 +11,7 @@ import (
 	"github.com/mewfork/dot"
 	"github.com/mewkiz/pkg/errutil"
 	"github.com/mewrev/graphs"
+	"github.com/mewrev/graphs/iso"
 )
 
 // When flagStart is a non-empty string, locate an isomorphism of the subgraph
@@ -40,15 +41,15 @@ func main() {
 		os.Exit(1)
 	}
 	subPath, graphPath := flag.Arg(0), flag.Arg(1)
-	err := iso(graphPath, subPath)
+	err := locate(graphPath, subPath)
 	if err != nil {
 		log.Fatalln(err)
 	}
 }
 
-// iso parses the provided graphs and tries to locate isomorphisms of the
+// locate parses the provided graphs and tries to locate isomorphisms of the
 // subgraph in the graph.
-func iso(graphPath, subPath string) error {
+func locate(graphPath, subPath string) error {
 	// Parse graphs.
 	graph, err := dot.ParseFile(graphPath)
 	if err != nil {
@@ -60,12 +61,12 @@ func iso(graphPath, subPath string) error {
 	}
 
 	// Locate isomorphisms.
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 1; i++ {
 		found := false
 		if len(flagStart) > 0 {
 			// Locate an isomorphism of sub in graph which starts at the node
 			// specified by the "-start" flag.
-			m, ok := graphs.Isomorphism(graph, flagStart, sub)
+			m, ok := iso.Isomorphism(graph, flagStart, sub)
 			if ok {
 				found = true
 				printMapping(graph, sub, m)
@@ -78,7 +79,7 @@ func iso(graphPath, subPath string) error {
 			}
 			sort.Strings(names)
 			for _, name := range names {
-				m, ok := graphs.Isomorphism(graph, name, sub)
+				m, ok := iso.Isomorphism(graph, name, sub)
 				if !ok {
 					continue
 				}

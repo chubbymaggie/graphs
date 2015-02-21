@@ -131,13 +131,7 @@ func (eq *Equation) Solve(graph *dot.Graph, sub *graphs.SubGraph) error {
 // otherwise.
 func (eq *Equation) solve(graph *dot.Graph, sub *graphs.SubGraph, out chan map[string]string) {
 	for !eq.IsSolved(graph, sub) {
-		// No candidates left.
-		if len(eq.c) == 0 {
-			out <- nil
-			return
-		}
-
-		// Locate unique node pairs.
+		// TODO: Remove debug output.
 		fmt.Println("___ [ before unique pairs ] _________")
 		fmt.Println()
 		fmt.Println("candidate mapping:")
@@ -148,6 +142,14 @@ func (eq *Equation) solve(graph *dot.Graph, sub *graphs.SubGraph, out chan map[s
 		fmt.Println()
 		spew.Dump(eq.m)
 		fmt.Println()
+
+		// No candidates left.
+		if len(eq.c) == 0 {
+			out <- nil
+			return
+		}
+
+		// Locate unique node pairs.
 		ok, err := eq.SolveUnique()
 		if err != nil {
 			log.Println(errutil.Err(err))
@@ -185,7 +187,7 @@ func (eq *Equation) solve(graph *dot.Graph, sub *graphs.SubGraph, out chan map[s
 		ncandidates := len(candidates)
 		in := make(chan map[string]string)
 		for gname := range candidates {
-			fmt.Println("gname:", gname, "sname:", sname)
+			fmt.Println("sname:", sname, "gname:", gname)
 			fmt.Println()
 			go func(eq *Equation, gname string) {
 				err := eq.SetPair(sname, gname)
