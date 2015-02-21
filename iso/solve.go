@@ -19,6 +19,10 @@ type Equation struct {
 	m map[string]string
 }
 
+// TODO: Remove the C and M methods.
+func (eq *Equation) C() map[string]map[string]bool { return eq.c }
+func (eq *Equation) M() map[string]string          { return eq.m }
+
 // Candidates locates node pair candidates for an isomorphism of sub in graph
 // which starts at the entry node.
 func Candidates(graph *dot.Graph, entry string, sub *graphs.SubGraph) (*Equation, error) {
@@ -42,6 +46,9 @@ func Candidates(graph *dot.Graph, entry string, sub *graphs.SubGraph) (*Equation
 	}
 	eq.findCandidates(g, s, sub)
 	if len(eq.c) != len(sub.Nodes.Nodes) {
+		fmt.Println("### [ incomplete mapping ] ###")
+		spew.Dump(eq.c)
+		fmt.Println("### [/ incomplete mapping ] ###")
 		return nil, errutil.Newf("incomplete candidate mapping; expected %d map entites, got %d", len(sub.Nodes.Nodes), len(eq.c))
 	}
 
