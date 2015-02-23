@@ -92,6 +92,81 @@ func TestCandidates(t *testing.T) {
 	}
 
 	for i, g := range golden {
+		sub, err := graphs.ParseSubGraph(g.subPath)
+		if err != nil {
+			t.Errorf("i=%d: %v", i, err)
+			continue
+		}
+		graph, err := dot.ParseFile(g.graphPath)
+		if err != nil {
+			t.Errorf("i=%d: %v", i, err)
+			continue
+		}
+		eq, err := Candidates(graph, g.entry, sub)
+		if err != nil {
+			t.Errorf("i=%d: %v", i, err)
+			continue
+		}
+		if !reflect.DeepEqual(eq.c, g.want) {
+			t.Errorf("i=%d: candidate map mismatch; expected %v, got %v", i, g.want, eq.c)
+		}
+	}
+}
+
+func TestSolve(t *testing.T) {
+	golden := []struct {
+		subPath   string
+		graphPath string
+		entry     string
+		wants     []map[string]string
+	}{
+		{
+			subPath:   "../testdata/primitives/if_else.dot",
+			graphPath: "../testdata/primitives/if_else.dot",
+			entry:     "A",
+			wants: []map[string]string{
+				{
+					"A": "A",
+					"B": "B",
+					"C": "C",
+					"D": "D",
+				},
+				{
+					"A": "A",
+					"B": "C",
+					"C": "B",
+					"D": "D",
+				},
+			},
+		},
+		{
+			subPath:   "../testdata/primitives/if_else.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			entry:     "85",
+			wants:     []map[string]string{nil},
+		},
+		{
+			subPath:   "../testdata/primitives/while.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			entry:     "71",
+			wants:     []map[string]string{nil},
+		},
+		{
+			subPath:   "../testdata/primitives/while.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			entry:     "89",
+			wants: []map[string]string{
+				{
+					"A": "89",
+					"B": "92",
+					"C": "93",
+				},
+			},
+		},
+	}
+
+loop:
+	for i, g := range golden {
 		graph, err := dot.ParseFile(g.graphPath)
 		if err != nil {
 			t.Errorf("i=%d: %v", i, err)
@@ -107,8 +182,16 @@ func TestCandidates(t *testing.T) {
 			t.Errorf("i=%d: %v", i, err)
 			continue
 		}
-		if !reflect.DeepEqual(eq.c, g.want) {
-			t.Errorf("i=%d: candidate map mismatch; expected %v, got %v", i, g.want, eq.c)
+		m, err := eq.Solve(graph, sub)
+		if err != nil {
+			t.Errorf("i=%d: %v", i, err)
+			continue
 		}
+		for _, want := range g.wants {
+			if reflect.DeepEqual(m, want) {
+				continue loop
+			}
+		}
+		t.Errorf("i=%d: node pair map mismatch; expected one of %v, got %v", i, g.wants, m)
 	}
 }
