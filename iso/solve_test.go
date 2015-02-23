@@ -36,6 +36,25 @@ func TestCandidates(t *testing.T) {
 				},
 			},
 		},
+		{
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			entry:     "85",
+			subPath:   "../testdata/primitives/if_else.dot",
+			want: map[string]map[string]bool{
+				"A": map[string]bool{
+					"85": true,
+				},
+				"B": map[string]bool{
+					"88": true,
+				},
+				"C": map[string]bool{
+					"88": true,
+				},
+				"D": map[string]bool{
+					"89": true,
+				},
+			},
+		},
 	}
 
 	for i, g := range golden {
