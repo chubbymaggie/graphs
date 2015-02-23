@@ -67,9 +67,6 @@ func Candidates(graph *dot.Graph, entry string, sub *graphs.SubGraph) (*Equation
 	}
 	eq.findCandidates(g, s, sub)
 	if len(eq.c) != len(sub.Nodes.Nodes) {
-		fmt.Println("### [ incomplete mapping ] ###")
-		spew.Dump(eq.c)
-		fmt.Println("### [/ incomplete mapping ] ###")
 		return nil, errutil.Newf("incomplete candidate mapping; expected %d map entites, got %d", len(sub.Nodes.Nodes), len(eq.c))
 	}
 
@@ -87,8 +84,6 @@ func (eq *Equation) findCandidates(g, s *dot.Node, sub *graphs.SubGraph) {
 	// Prevent infinite cycles.
 	if _, ok := eq.c[s.Name]; ok {
 		if eq.c[s.Name][g.Name] {
-			// TODO: Remove debug output.
-			log.Printf("already visited (%q=%q)\n", s.Name, g.Name)
 			return
 		}
 	}
@@ -97,8 +92,8 @@ func (eq *Equation) findCandidates(g, s *dot.Node, sub *graphs.SubGraph) {
 	if _, ok := eq.c[s.Name]; !ok {
 		eq.c[s.Name] = make(map[string]bool)
 	} else if s.Name == sub.Entry() {
-		// Find candidates for the entry node and its immediate successors exactly
-		// once.
+		// Locate candidates for the entry node and its immediate successors
+		// exactly once.
 		return
 	}
 	eq.c[s.Name][g.Name] = true

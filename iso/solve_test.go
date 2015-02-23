@@ -2,6 +2,7 @@ package iso
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/mewfork/dot"
@@ -14,6 +15,7 @@ func TestCandidates(t *testing.T) {
 		graphPath string
 		entry     string
 		want      map[string]map[string]bool
+		err       string
 	}{
 		{
 			subPath:   "../testdata/primitives/if_else.dot",
@@ -35,6 +37,7 @@ func TestCandidates(t *testing.T) {
 					"D": true,
 				},
 			},
+			err: "",
 		},
 		{
 			subPath:   "../testdata/primitives/if_else.dot",
@@ -54,6 +57,7 @@ func TestCandidates(t *testing.T) {
 					"89": true,
 				},
 			},
+			err: "",
 		},
 		{
 			subPath:   "../testdata/primitives/while.dot",
@@ -70,6 +74,7 @@ func TestCandidates(t *testing.T) {
 					"74": true,
 				},
 			},
+			err: "",
 		},
 		{
 			subPath:   "../testdata/primitives/while.dot",
@@ -88,6 +93,45 @@ func TestCandidates(t *testing.T) {
 					"93": true,
 				},
 			},
+			err: "",
+		},
+		{
+			subPath:   "../testdata/primitives/if.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			entry:     "71",
+			want: map[string]map[string]bool{
+				"A": map[string]bool{
+					"71": true,
+				},
+				"B": map[string]bool{
+					"74": true,
+				},
+				"C": map[string]bool{
+					"75": true,
+				},
+			},
+			err: "",
+		},
+		{
+			subPath:   "../testdata/primitives/if.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			entry:     "foo",
+			want:      nil,
+			err:       `unable to locate entry node "foo" in graph`,
+		},
+		{
+			subPath:   "../testdata/primitives/if.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			entry:     "97",
+			want:      nil,
+			err:       `invalid entry node candidate "97"; expected 2 successors, got 1`,
+		},
+		{
+			subPath:   "../testdata/primitives/if_else.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			entry:     "68",
+			want:      nil,
+			err:       "incomplete candidate mapping; expected 4 map entites, got 1",
 		},
 	}
 
@@ -103,8 +147,11 @@ func TestCandidates(t *testing.T) {
 			continue
 		}
 		eq, err := Candidates(graph, g.entry, sub)
-		if err != nil {
-			t.Errorf("i=%d: %v", i, err)
+		if !sameError(err, g.err) {
+			t.Errorf("i=%d: error mismatch; expected %v, got %v", i, g.err, err)
+			continue
+		} else if err != nil {
+			// Expected error, check next test case.
 			continue
 		}
 		if !reflect.DeepEqual(eq.c, g.want) {
@@ -163,6 +210,18 @@ func TestSolve(t *testing.T) {
 				},
 			},
 		},
+		{
+			subPath:   "../testdata/primitives/if.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			entry:     "71",
+			wants: []map[string]string{
+				{
+					"A": "71",
+					"B": "74",
+					"C": "75",
+				},
+			},
+		},
 	}
 
 loop:
@@ -194,4 +253,23 @@ loop:
 		}
 		t.Errorf("i=%d: node pair map mismatch; expected one of %v, got %v", i, g.wants, m)
 	}
+}
+
+// sameError returns true if err is represented by the string s, and false
+// otherwise. Some error messages contains "file:line" prefixes and suffixes
+// from external functions, e.g.
+//
+//    github.com/mewrev/graphs/iso.Candidates (solve.go:53): error: unable to locate entry node "foo" in graph
+//    unable to parse integer constant "foo"; strconv.ParseInt: parsing "foo": invalid syntax`
+//
+// For this reason s matches the error if it is a non-empty substring of err.
+func sameError(err error, s string) bool {
+	t := ""
+	if err != nil {
+		if len(s) == 0 {
+			return false
+		}
+		t = err.Error()
+	}
+	return strings.Contains(t, s)
 }
