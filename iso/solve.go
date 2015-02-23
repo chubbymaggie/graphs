@@ -93,14 +93,15 @@ func (eq *Equation) findCandidates(g, s *dot.Node, sub *graphs.SubGraph) {
 		}
 	}
 
-	// Add node pair candidate. Add entry node pair exactly once.
+	// Add node pair candidate.
 	if _, ok := eq.c[s.Name]; !ok {
-		eq.c[s.Name] = map[string]bool{
-			g.Name: true,
-		}
-	} else if s.Name != sub.Entry() {
-		eq.c[s.Name][g.Name] = true
+		eq.c[s.Name] = make(map[string]bool)
+	} else if s.Name == sub.Entry() {
+		// Find candidates for the entry node and its immediate successors exactly
+		// once.
+		return
 	}
+	eq.c[s.Name][g.Name] = true
 
 	// Recursively locate candidate successor pairs.
 	for _, ssucc := range s.Succs {
