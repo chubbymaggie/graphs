@@ -115,12 +115,18 @@ func (eq *Equation) findCandidates(g, s *dot.Node, sub *graphs.SubGraph) {
 func (eq *Equation) Solve(graph *dot.Graph, sub *graphs.SubGraph) error {
 	out := make(chan map[string]string)
 	go eq.solve(graph, sub, out)
-	m := <-out
-	if m == nil {
-		return errutil.New("unable to solve node pair equation")
+	for i := 0; i < 100; i++ {
+		m := <-out
+		//if m == nil {
+		//	return errutil.New("unable to solve node pair equation")
+		//}
+		//fmt.Println("@@@ [ mapping found ] @@@@@@@@@@@@@@@@")
+		if m != nil {
+			spew.Dump(fmt.Sprintf("i=%d", i), m)
+		} else {
+			fmt.Println("<nil>")
+		}
 	}
-	fmt.Println("@@@ [ mapping found ] @@@@@@@@@@@@@@@@")
-	spew.Dump(m)
 
 	return nil
 }
