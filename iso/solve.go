@@ -113,7 +113,7 @@ func (eq *Equation) findCandidates(g, s *dot.Node, sub *graphs.SubGraph) {
 
 // Solve tries to locate a mapping from sub node name to graph node name for an
 // isomorphism of sub in graph based on the given node pair candidates.
-func (eq *Equation) Solve(graph *dot.Graph, sub *graphs.SubGraph) error {
+func (eq *Equation) Solve(graph *dot.Graph, sub *graphs.SubGraph) (m map[string]string, err error) {
 	out := make(chan map[string]string)
 	go eq.solve(graph, sub, out)
 	for i := 0; i < 100; i++ {
@@ -129,7 +129,7 @@ func (eq *Equation) Solve(graph *dot.Graph, sub *graphs.SubGraph) error {
 		}
 	}
 
-	return nil
+	return nil, nil
 }
 
 // solve tries to locate a mapping from sub node name to graph node name for an
