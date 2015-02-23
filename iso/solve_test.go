@@ -10,15 +10,15 @@ import (
 
 func TestCandidates(t *testing.T) {
 	golden := []struct {
+		subPath   string
 		graphPath string
 		entry     string
-		subPath   string
 		want      map[string]map[string]bool
 	}{
 		{
+			subPath:   "../testdata/primitives/if_else.dot",
 			graphPath: "../testdata/primitives/if_else.dot",
 			entry:     "A",
-			subPath:   "../testdata/primitives/if_else.dot",
 			want: map[string]map[string]bool{
 				"A": map[string]bool{
 					"A": true,
@@ -37,9 +37,9 @@ func TestCandidates(t *testing.T) {
 			},
 		},
 		{
+			subPath:   "../testdata/primitives/if_else.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
 			entry:     "85",
-			subPath:   "../testdata/primitives/if_else.dot",
 			want: map[string]map[string]bool{
 				"A": map[string]bool{
 					"85": true,
@@ -52,6 +52,40 @@ func TestCandidates(t *testing.T) {
 				},
 				"D": map[string]bool{
 					"89": true,
+				},
+			},
+		},
+		{
+			subPath:   "../testdata/primitives/while.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			entry:     "71",
+			want: map[string]map[string]bool{
+				"A": map[string]bool{
+					"71": true,
+				},
+				"B": map[string]bool{
+					"74": true,
+				},
+				"C": map[string]bool{
+					"74": true,
+				},
+			},
+		},
+		{
+			subPath:   "../testdata/primitives/while.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			entry:     "89",
+			want: map[string]map[string]bool{
+				"A": map[string]bool{
+					"89": true,
+				},
+				"B": map[string]bool{
+					"92": true,
+					"93": true,
+				},
+				"C": map[string]bool{
+					"92": true,
+					"93": true,
 				},
 			},
 		},
