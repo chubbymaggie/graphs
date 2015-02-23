@@ -308,8 +308,11 @@ func (eq *Equation) SetPair(sname, gname string) error {
 
 	// Remove graph node name of the unique node pair from all other node
 	// pairs in c.
-	for _, candidates := range eq.c {
+	for key, candidates := range eq.c {
 		delete(candidates, gname)
+		if len(eq.c[key]) == 0 {
+			return errutil.Newf("invalid mapping; sub node %q has no candidates", key)
+		}
 	}
 
 	return nil
