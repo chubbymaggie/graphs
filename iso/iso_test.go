@@ -447,6 +447,105 @@ func TestEquationSetPair(t *testing.T) {
 	}
 }
 
+func TestEquationDup(t *testing.T) {
+	golden := []struct {
+		in         *Equation
+		ckey, mkey string
+		want       *Equation
+	}{
+		// i=0
+		{
+			in: &Equation{
+				c: map[string]map[string]bool{
+					"A": map[string]bool{
+						"A": true,
+					},
+					"B": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"C": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+				},
+				m: map[string]string{
+					"D": "D",
+					"E": "E",
+				},
+			},
+			ckey: "A", mkey: "D",
+			want: &Equation{
+				c: map[string]map[string]bool{
+					"B": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"C": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+				},
+				m: map[string]string{
+					"E": "E",
+				},
+			},
+		},
+		// i=1
+		{
+			in: &Equation{
+				c: map[string]map[string]bool{
+					"B": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"C": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+				},
+				m: map[string]string{
+					"A": "A",
+					"D": "D",
+					"E": "E",
+				},
+			},
+			ckey: "B", mkey: "E",
+			want: &Equation{
+				c: map[string]map[string]bool{
+					"C": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+				},
+				m: map[string]string{
+					"A": "A",
+					"D": "D",
+				},
+			},
+		},
+	}
+
+	for i, g := range golden {
+		got := g.in.Dup()
+		if !reflect.DeepEqual(got, g.in) {
+			t.Errorf("i=%d: equation copy differs from original; expected %v, got %v", i, g.in, got)
+			continue
+		}
+		delete(got.c, g.ckey)
+		delete(got.m, g.mkey)
+		if reflect.DeepEqual(got.c, g.in.c) {
+			t.Errorf("i=%d: copy refers to the same candidate node pair map as the original equation", i)
+		}
+		if reflect.DeepEqual(got.m, g.in.m) {
+			t.Errorf("i=%d: copy refers to the same known node pair map as the original equation", i)
+		}
+		if !reflect.DeepEqual(got, g.want) {
+			t.Errorf("i=%d: unable to delete keys from equation copy", i)
+		}
+	}
+}
+
 // sameError returns true if err is represented by the string s, and false
 // otherwise. Some error messages contains "file:line" prefixes and suffixes
 // from external functions, e.g.
