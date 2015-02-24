@@ -17,6 +17,7 @@ func TestCandidates(t *testing.T) {
 		want      map[string]map[string]bool
 		err       string
 	}{
+		// i=0
 		{
 			subPath:   "../testdata/primitives/if_else.dot",
 			graphPath: "../testdata/primitives/if_else.dot",
@@ -39,6 +40,7 @@ func TestCandidates(t *testing.T) {
 			},
 			err: "",
 		},
+		// i=1
 		{
 			subPath:   "../testdata/primitives/if_else.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
@@ -59,6 +61,7 @@ func TestCandidates(t *testing.T) {
 			},
 			err: "",
 		},
+		// i=2
 		{
 			subPath:   "../testdata/primitives/while.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
@@ -76,6 +79,7 @@ func TestCandidates(t *testing.T) {
 			},
 			err: "",
 		},
+		// i=3
 		{
 			subPath:   "../testdata/primitives/while.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
@@ -95,6 +99,7 @@ func TestCandidates(t *testing.T) {
 			},
 			err: "",
 		},
+		// i=4
 		{
 			subPath:   "../testdata/primitives/if.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
@@ -112,6 +117,7 @@ func TestCandidates(t *testing.T) {
 			},
 			err: "",
 		},
+		// i=5
 		{
 			subPath:   "../testdata/primitives/if.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
@@ -119,6 +125,7 @@ func TestCandidates(t *testing.T) {
 			want:      nil,
 			err:       `unable to locate entry node "foo" in graph`,
 		},
+		// i=6
 		{
 			subPath:   "../testdata/primitives/if.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
@@ -126,6 +133,7 @@ func TestCandidates(t *testing.T) {
 			want:      nil,
 			err:       `invalid entry node candidate "97"; expected 2 successors, got 1`,
 		},
+		// i=7
 		{
 			subPath:   "../testdata/primitives/if_else.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
@@ -167,6 +175,7 @@ func TestSolve(t *testing.T) {
 		entry     string
 		wants     []map[string]string
 	}{
+		// i=0
 		{
 			subPath:   "../testdata/primitives/if_else.dot",
 			graphPath: "../testdata/primitives/if_else.dot",
@@ -186,18 +195,21 @@ func TestSolve(t *testing.T) {
 				},
 			},
 		},
+		// i=1
 		{
 			subPath:   "../testdata/primitives/if_else.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
 			entry:     "85",
 			wants:     []map[string]string{nil},
 		},
+		// i=2
 		{
 			subPath:   "../testdata/primitives/while.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
 			entry:     "71",
 			wants:     []map[string]string{nil},
 		},
+		// i=3
 		{
 			subPath:   "../testdata/primitives/while.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
@@ -210,6 +222,7 @@ func TestSolve(t *testing.T) {
 				},
 			},
 		},
+		// i=4
 		{
 			subPath:   "../testdata/primitives/if.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
@@ -252,6 +265,168 @@ loop:
 			}
 		}
 		t.Errorf("i=%d: node pair map mismatch; expected one of %v, got %v", i, g.wants, m)
+	}
+}
+
+func TestEquationSetPair(t *testing.T) {
+	golden := []struct {
+		in           *Equation
+		sname, gname string
+		want         *Equation
+		err          string
+	}{
+		// i=0
+		{
+			in: &Equation{
+				c: map[string]map[string]bool{
+					"A": map[string]bool{
+						"A": true,
+					},
+					"B": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"C": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"D": map[string]bool{
+						"D": true,
+					},
+				},
+				m: map[string]string{},
+			},
+			sname: "A", gname: "A",
+			want: &Equation{
+				c: map[string]map[string]bool{
+					"B": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"C": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"D": map[string]bool{
+						"D": true,
+					},
+				},
+				m: map[string]string{
+					"A": "A",
+				},
+			},
+			err: "",
+		},
+		// i=1
+		{
+			in: &Equation{
+				c: map[string]map[string]bool{
+					"B": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"C": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"D": map[string]bool{
+						"D": true,
+					},
+				},
+				m: map[string]string{
+					"A": "A",
+				},
+			},
+			sname: "B", gname: "B",
+			want: &Equation{
+				c: map[string]map[string]bool{
+					"C": map[string]bool{
+						"C": true,
+					},
+					"D": map[string]bool{
+						"D": true,
+					},
+				},
+				m: map[string]string{
+					"A": "A",
+					"B": "B",
+				},
+			},
+			err: "",
+		},
+		// i=2
+		{
+			in: &Equation{
+				c: map[string]map[string]bool{
+					"B": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"C": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"D": map[string]bool{
+						"D": true,
+					},
+				},
+				m: map[string]string{
+					"A": "A",
+				},
+			},
+			sname: "B", gname: "C",
+			want: &Equation{
+				c: map[string]map[string]bool{
+					"C": map[string]bool{
+						"B": true,
+					},
+					"D": map[string]bool{
+						"D": true,
+					},
+				},
+				m: map[string]string{
+					"A": "A",
+					"B": "C",
+				},
+			},
+			err: "",
+		},
+		// i=3
+		{
+			in: &Equation{
+				c: map[string]map[string]bool{
+					"A": map[string]bool{
+						"A": true,
+						"D": true,
+					},
+					"C": map[string]bool{
+						"A": true,
+						"C": true,
+					},
+					"D": map[string]bool{
+						"D": true,
+					},
+				},
+				m: map[string]string{},
+			},
+			sname: "A", gname: "D",
+			want: nil,
+			err:  `invalid mapping; sub node "D" has no candidates`,
+		},
+	}
+
+	for i, g := range golden {
+		err := g.in.SetPair(g.sname, g.gname)
+		if !sameError(err, g.err) {
+			t.Errorf("i=%d: error mismatch; expected %v, got %v", i, g.err, err)
+			continue
+		} else if err != nil {
+			// Expected error, check next test case.
+			continue
+		}
+		if !reflect.DeepEqual(g.want, g.in) {
+			t.Errorf("i=%d: node pair equation mismatch; expected %v, got %v", i, g.want, g.in)
+		}
 	}
 }
 
