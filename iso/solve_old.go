@@ -12,26 +12,6 @@ import (
 	"github.com/mewrev/graphs"
 )
 
-// Dup returns a copy of eq.
-func (eq *Equation) Dup() *Equation {
-	// Duplicate node pair candidates.
-	c := make(map[string]map[string]bool)
-	for sname, candidates := range eq.c {
-		c[sname] = make(map[string]bool)
-		for gname, val := range candidates {
-			c[sname][gname] = val
-		}
-	}
-
-	// Duplicate node pairs.
-	m := make(map[string]string)
-	for sname, gname := range eq.m {
-		m[sname] = gname
-	}
-
-	return &Equation{c: c, m: m}
-}
-
 // TODO: Remove the C and M methods.
 func (eq *Equation) C() map[string]map[string]bool { return eq.c }
 func (eq *Equation) M() map[string]string          { return eq.m }
