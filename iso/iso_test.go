@@ -413,6 +413,23 @@ func TestEquationSetPair(t *testing.T) {
 			want: nil,
 			err:  `invalid mapping; sub node "D" has no candidates`,
 		},
+		// i=3
+		{
+			in: &Equation{
+				c: map[string]map[string]bool{
+					"A": map[string]bool{
+						"0": true,
+						"1": true,
+					},
+				},
+				m: map[string]string{
+					"B": "1",
+				},
+			},
+			sname: "A", gname: "1",
+			want: nil,
+			err:  `invalid mapping; sub node "B" and "A" both map to graph node "1"`,
+		},
 	}
 
 	for i, g := range golden {
