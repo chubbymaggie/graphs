@@ -224,8 +224,8 @@ func (eq *Equation) SolveUnique() (ok bool, err error) {
 // from all other node pairs in c.
 func (eq *Equation) SetPair(sname, gname string) error {
 	// Sanity check.
-	if contains(eq.m, gname) {
-		return errutil.Newf("invalid mapping; sub node %q and %q both map to graph node %q", eq.m[sname], sname, gname)
+	if key, ok := getKey(eq.m, gname); ok {
+		return errutil.Newf("invalid mapping; sub node %q and %q both map to graph node %q", key, sname, gname)
 	}
 
 	// Move unique node pair from c to m.
@@ -244,14 +244,15 @@ func (eq *Equation) SetPair(sname, gname string) error {
 	return nil
 }
 
-// contains returns true if m contains the value val, and false otherwise.
-func contains(m map[string]string, val string) bool {
-	for _, x := range m {
+// getKey returns the first key in m which maps to the value val. The boolean
+// value is true if such a key could be located, and false otherwise.
+func getKey(m map[string]string, val string) (key string, ok bool) {
+	for key, x := range m {
 		if x == val {
-			return true
+			return key, true
 		}
 	}
-	return false
+	return "", false
 }
 
 // pop returns the only key in m.
