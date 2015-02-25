@@ -1124,6 +1124,204 @@ func TestEquationIsValid(t *testing.T) {
 	}
 }
 
+func TestIsomorphism(t *testing.T) {
+	golden := []struct {
+		subPath   string
+		graphPath string
+		entry     string
+		m         map[string]string
+		ok        bool
+	}{
+		// i=0
+		{
+			subPath:   "../testdata/primitives/if.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			entry:     "71",
+			m: map[string]string{
+				"A": "71",
+				"B": "74",
+				"C": "75",
+			},
+			ok: true,
+		},
+		// i=1
+		{
+			subPath:   "../testdata/primitives/if.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			entry:     "17",
+			m: map[string]string{
+				"A": "17",
+				"B": "24",
+				"C": "32",
+			},
+			ok: true,
+		},
+		// i=2
+		{
+			subPath:   "../testdata/primitives/if.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			entry:     "89",
+			m:         nil,
+			ok:        false,
+		},
+		// i=3
+		{
+			subPath:   "../testdata/primitives/if.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			entry:     "94",
+			m:         nil,
+			ok:        false,
+		},
+		// i=4
+		{
+			subPath:   "../testdata/primitives/if_else.dot",
+			graphPath: "../testdata/c4_graphs/expr.dot",
+			entry:     "282",
+			m: map[string]string{
+				"A": "282",
+				"B": "287",
+				"C": "292",
+				"D": "299",
+			},
+			ok: true,
+		},
+		// i=5
+		{
+			subPath:   "../testdata/primitives/if_else.dot",
+			graphPath: "../testdata/c4_graphs/next.dot",
+			entry:     "438",
+			m: map[string]string{
+				"A": "438",
+				"B": "443",
+				"C": "446",
+				"D": "447",
+			},
+			ok: true,
+		},
+		// i=6
+		{
+			subPath:   "../testdata/primitives/if_else.dot",
+			graphPath: "../testdata/c4_graphs/next.dot",
+			entry:     "487",
+			m: map[string]string{
+				"A": "487",
+				"B": "492",
+				"C": "495",
+				"D": "496",
+			},
+			ok: true,
+		},
+		// i=7
+		{
+			subPath:   "../testdata/primitives/if_else.dot",
+			graphPath: "../testdata/c4_graphs/next.dot",
+			entry:     "124",
+			m:         nil,
+			ok:        false,
+		},
+		// i=8
+		{
+			subPath:   "../testdata/primitives/list.dot",
+			graphPath: "../testdata/c4_graphs/main.dot",
+			entry:     "740",
+			m: map[string]string{
+				"A": "740",
+				"B": "760",
+			},
+			ok: true,
+		},
+		// i=9
+		{
+			subPath:   "../testdata/primitives/list.dot",
+			graphPath: "../testdata/c4_graphs/main.dot",
+			entry:     "761",
+			m:         nil,
+			ok:        false,
+		},
+		// i=10
+		{
+			subPath:   "../testdata/primitives/while.dot",
+			graphPath: "../testdata/c4_graphs/expr.dot",
+			entry:     "191",
+			m: map[string]string{
+				"A": "191",
+				"B": "194",
+				"C": "196",
+			},
+			ok: true,
+		},
+		// i=11
+		{
+			subPath:   "../testdata/primitives/while.dot",
+			graphPath: "../testdata/c4_graphs/expr.dot",
+			entry:     "370",
+			m:         nil,
+			ok:        false,
+		},
+		// i=12
+		{
+			subPath:   "../testdata/primitives/while.dot",
+			graphPath: "../testdata/c4_graphs/expr.dot",
+			entry:     "526",
+			m:         nil,
+			ok:        false,
+		},
+		// i=13
+		{
+			subPath:   "../testdata/primitives/if_else.dot",
+			graphPath: "../testdata/c4_graphs/expr.dot",
+			entry:     "611",
+			m:         nil,
+			ok:        false,
+		},
+		// i=14
+		{
+			subPath:   "../testdata/primitives/if_else.dot",
+			graphPath: "../testdata/c4_graphs/expr.dot",
+			entry:     "611",
+			m:         nil,
+			ok:        false,
+		},
+		// i=15
+		{
+			subPath:   "../testdata/primitives/if.dot",
+			graphPath: "../testdata/c4_graphs/main.dot",
+			entry:     "20",
+			m:         nil,
+			ok:        false,
+		},
+		// i=16
+		{
+			subPath:   "../testdata/primitives/while.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			entry:     "39",
+			m:         nil,
+			ok:        false,
+		},
+	}
+
+	for i, g := range golden {
+		sub, err := graphs.ParseSubGraph(g.subPath)
+		if err != nil {
+			t.Errorf("i=%d: %v", i, err)
+			continue
+		}
+		graph, err := dot.ParseFile(g.graphPath)
+		if err != nil {
+			t.Errorf("i=%d: %v", i, err)
+			continue
+		}
+		m, ok := Isomorphism(graph, g.entry, sub)
+		if ok != g.ok {
+			t.Errorf("i=%d: ok mismatch; expected %v, got %v", i, g.ok, ok)
+			continue
+		}
+		if !reflect.DeepEqual(m, g.m) {
+			t.Errorf("i=%d: node pair mapping mismatch; expected %v, got %v", i, g.m, m)
+		}
+	}
+}
+
 // sameError returns true if err is represented by the string s, and false
 // otherwise. Some error messages contains "file:line" prefixes and suffixes
 // from external functions, e.g.

@@ -1,8 +1,7 @@
+// Package iso implements subgraph isomorphism search algorithms.
 package iso
 
 import (
-	"log"
-
 	"github.com/mewfork/dot"
 	"github.com/mewrev/graphs"
 )
@@ -14,12 +13,10 @@ import (
 func Isomorphism(graph *dot.Graph, entry string, sub *graphs.SubGraph) (m map[string]string, ok bool) {
 	eq, err := Candidates(graph, entry, sub)
 	if err != nil {
-		log.Println(err)
 		return nil, false
 	}
 	m, err = eq.SolveBrute(graph, sub)
 	if err != nil {
-		log.Println(err)
 		return nil, false
 	}
 	return m, true
