@@ -2,6 +2,8 @@
 package iso
 
 import (
+	"sort"
+
 	"github.com/mewfork/dot"
 	"github.com/mewrev/graphs"
 )
@@ -20,4 +22,23 @@ func Isomorphism(graph *dot.Graph, entry string, sub *graphs.SubGraph) (m map[st
 		return nil, false
 	}
 	return m, true
+}
+
+// Search tries to locate an isomorphism of sub in graph. If successful it
+// returns the mapping from sub node name to graph node name of the first
+// isomorphism located. The boolean value is true if such a mapping could be
+// located, and false otherwise.
+func Search(graph *dot.Graph, sub *graphs.SubGraph) (m map[string]string, ok bool) {
+	var names []string
+	for name := range graph.Nodes.Lookup {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	for _, name := range names {
+		m, ok = Isomorphism(graph, name, sub)
+		if ok {
+			return m, true
+		}
+	}
+	return nil, false
 }
