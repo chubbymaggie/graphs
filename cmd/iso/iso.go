@@ -61,53 +61,36 @@ func locate(graphPath, subPath string) error {
 	}
 
 	// Locate isomorphisms.
-	for i := 0; i < 1; i++ {
-		found := false
-		if len(flagStart) > 0 {
-			// Locate an isomorphism of sub in graph which starts at the node
-			// specified by the "-start" flag.
-			m, ok := iso.Isomorphism(graph, flagStart, sub)
-			if ok {
-				found = true
-				printMapping(graph, sub, m)
-			}
-		} else {
-			// Locate all isomorphisms of sub in graph.
-			var names []string
-			for name := range graph.Nodes.Lookup {
-				names = append(names, name)
-			}
-			sort.Strings(names)
-			for _, name := range names {
-				m, ok := iso.Isomorphism(graph, name, sub)
-				if !ok {
-					continue
-				}
-				found = true
-				//printMapping(graph, sub, m)
-				fmt.Println("found:", sorted(m))
-			}
+	found := false
+	if len(flagStart) > 0 {
+		// Locate an isomorphism of sub in graph which starts at the node
+		// specified by the "-start" flag.
+		m, ok := iso.Isomorphism(graph, flagStart, sub)
+		if ok {
+			found = true
+			printMapping(graph, sub, m)
 		}
-		if !found {
-			fmt.Println("not found.")
+	} else {
+		// Locate all isomorphisms of sub in graph.
+		var names []string
+		for name := range graph.Nodes.Lookup {
+			names = append(names, name)
 		}
+		sort.Strings(names)
+		for _, name := range names {
+			m, ok := iso.Isomorphism(graph, name, sub)
+			if !ok {
+				continue
+			}
+			found = true
+			printMapping(graph, sub, m)
+		}
+	}
+	if !found {
+		fmt.Println("not found.")
 	}
 
 	return nil
-}
-
-func sorted(m map[string]string) string {
-	var keys []string
-	for key := range m {
-		keys = append(keys, key)
-	}
-	sort.Strings(keys)
-	var s string
-	for _, key := range keys {
-		s += fmt.Sprintf("%q:%q, ", key, m[key])
-	}
-	return s
-
 }
 
 // printMapping prints the mapping from sub node name to graph node name for an
