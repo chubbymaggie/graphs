@@ -2,6 +2,7 @@ package iso
 
 import (
 	"log"
+	"sort"
 
 	"github.com/mewfork/dot"
 	"github.com/mewkiz/pkg/errutil"
@@ -21,7 +22,15 @@ func (eq *Equation) IsValid(graph *dot.Graph, sub *graphs.SubGraph) bool {
 		return false
 	}
 
-	for sname, gname := range eq.m {
+	// Sort keys to make the algorithm deterministic.
+	var snames []string
+	for sname := range eq.m {
+		snames = append(snames, sname)
+	}
+	sort.Strings(snames)
+
+	for _, sname := range snames {
+		gname := eq.m[sname]
 		s, ok := sub.Nodes.Lookup[sname]
 		if !ok {
 			err := errutil.Newf("unable to locate node %q in sub", sname)
