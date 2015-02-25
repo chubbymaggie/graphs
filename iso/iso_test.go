@@ -1322,6 +1322,207 @@ func TestIsomorphism(t *testing.T) {
 	}
 }
 
+func TestSearch(t *testing.T) {
+	golden := []struct {
+		subPath   string
+		graphPath string
+		m         map[string]string
+		ok        bool
+	}{
+		// i=0
+		{
+			subPath:   "../testdata/primitives/if.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			m: map[string]string{
+				"A": "17",
+				"B": "24",
+				"C": "32",
+			},
+			ok: true,
+		},
+		// i=1
+		{
+			subPath:   "../testdata/primitives/if_else.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			m:         nil,
+			ok:        false,
+		},
+		// i=2
+		{
+			subPath:   "../testdata/primitives/list.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			m: map[string]string{
+				"A": "101",
+				"B": "105",
+			},
+			ok: true,
+		},
+		// i=3
+		{
+			subPath:   "../testdata/primitives/while.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			m: map[string]string{
+				"A": "89",
+				"B": "92",
+				"C": "93",
+			},
+			ok: true,
+		},
+
+		// i=4
+		{
+			subPath:   "../testdata/primitives/if.dot",
+			graphPath: "../testdata/c4_graphs/expr.dot",
+			m: map[string]string{
+				"A": "120",
+				"B": "122",
+				"C": "127",
+			},
+			ok: true,
+		},
+		// i=5
+		{
+			subPath:   "../testdata/primitives/if_else.dot",
+			graphPath: "../testdata/c4_graphs/expr.dot",
+			m: map[string]string{
+				"A": "282",
+				"B": "287",
+				"C": "292",
+				"D": "299",
+			},
+			ok: true,
+		},
+		// i=6
+		{
+			subPath:   "../testdata/primitives/list.dot",
+			graphPath: "../testdata/c4_graphs/expr.dot",
+			m: map[string]string{
+				"A": "109",
+				"B": "119",
+			},
+			ok: true,
+		},
+		// i=7
+		{
+			subPath:   "../testdata/primitives/while.dot",
+			graphPath: "../testdata/c4_graphs/expr.dot",
+			m: map[string]string{
+				"A": "191",
+				"B": "194",
+				"C": "196",
+			},
+			ok: true,
+		},
+
+		// i=8
+		{
+			subPath:   "../testdata/primitives/if.dot",
+			graphPath: "../testdata/c4_graphs/next.dot",
+			m: map[string]string{
+				"A": "195",
+				"B": "200",
+				"C": "205",
+			},
+			ok: true,
+		},
+		// i=9
+		{
+			subPath:   "../testdata/primitives/if_else.dot",
+			graphPath: "../testdata/c4_graphs/next.dot",
+			m: map[string]string{
+				"A": "28",
+				"B": "39",
+				"C": "44",
+				"D": "46",
+			},
+			ok: true,
+		},
+		// i=10
+		{
+			subPath:   "../testdata/primitives/list.dot",
+			graphPath: "../testdata/c4_graphs/next.dot",
+			m: map[string]string{
+				"A": "320",
+				"B": "322",
+			},
+			ok: true,
+		},
+		// i=11
+		{
+			subPath:   "../testdata/primitives/while.dot",
+			graphPath: "../testdata/c4_graphs/next.dot",
+			m:         nil,
+			ok:        false,
+		},
+
+		// i=12
+		{
+			subPath:   "../testdata/primitives/if.dot",
+			graphPath: "../testdata/c4_graphs/main.dot",
+			m: map[string]string{
+				"A": "135",
+				"B": "138",
+				"C": "139",
+			},
+			ok: true,
+		},
+		// i=13
+		{
+			subPath:   "../testdata/primitives/if_else.dot",
+			graphPath: "../testdata/c4_graphs/main.dot",
+			m: map[string]string{
+				"A": "442",
+				"B": "448",
+				"C": "451",
+				"D": "453",
+			},
+			ok: true,
+		},
+		// i=14
+		{
+			subPath:   "../testdata/primitives/list.dot",
+			graphPath: "../testdata/c4_graphs/main.dot",
+			m: map[string]string{
+				"A": "740",
+				"B": "760",
+			},
+			ok: true,
+		},
+		// i=15
+		{
+			subPath:   "../testdata/primitives/while.dot",
+			graphPath: "../testdata/c4_graphs/main.dot",
+			m: map[string]string{
+				"A": "190",
+				"B": "193",
+				"C": "195",
+			},
+			ok: true,
+		},
+	}
+
+	for i, g := range golden {
+		sub, err := graphs.ParseSubGraph(g.subPath)
+		if err != nil {
+			t.Errorf("i=%d: %v", i, err)
+			continue
+		}
+		graph, err := dot.ParseFile(g.graphPath)
+		if err != nil {
+			t.Errorf("i=%d: %v", i, err)
+			continue
+		}
+		m, ok := Search(graph, sub)
+		if ok != g.ok {
+			t.Errorf("i=%d: ok mismatch; expected %v, got %v", i, g.ok, ok)
+			continue
+		}
+		if !reflect.DeepEqual(m, g.m) {
+			t.Errorf("i=%d: node pair mapping mismatch; expected %v, got %v", i, g.m, m)
+		}
+	}
+}
+
 // sameError returns true if err is represented by the string s, and false
 // otherwise. Some error messages contains "file:line" prefixes and suffixes
 // from external functions, e.g.
