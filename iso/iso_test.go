@@ -1057,6 +1057,19 @@ func TestEquationIsValid(t *testing.T) {
 			},
 			want: false,
 		},
+		// i=18
+		{
+			subPath:   "../testdata/primitives/if.dot",
+			graphPath: "../testdata/c4_graphs/main.dot",
+			eq: &Equation{
+				m: map[string]string{
+					"A": "20",
+					"B": "25",
+					"C": "34",
+				},
+			},
+			want: false,
+		},
 	}
 
 	for i, g := range golden {
