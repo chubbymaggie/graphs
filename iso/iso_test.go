@@ -1070,6 +1070,32 @@ func TestEquationIsValid(t *testing.T) {
 			},
 			want: false,
 		},
+		// i=19
+		{
+			subPath:   "../testdata/primitives/while.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			eq: &Equation{
+				m: map[string]string{
+					"A": "39", // 48
+					"B": "44",
+					"C": "52", // 45
+				},
+			},
+			want: false,
+		},
+		// i=20
+		{
+			subPath:   "../testdata/primitives/while.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			eq: &Equation{
+				m: map[string]string{
+					"A": "39",
+					"B": "44",
+					"C": "45",
+				},
+			},
+			want: false,
+		},
 	}
 
 	for i, g := range golden {
