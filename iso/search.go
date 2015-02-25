@@ -17,7 +17,7 @@ func Isomorphism(graph *dot.Graph, entry string, sub *graphs.SubGraph) (m map[st
 		log.Println(err)
 		return nil, false
 	}
-	m, err = eq.Solve(graph, sub)
+	m, err = eq.SolveBrute(graph, sub)
 	if err != nil {
 		log.Println(err)
 		return nil, false

@@ -16,6 +16,10 @@ type Equation struct {
 	m map[string]string
 }
 
+// TODO: Remove the C and M methods.
+func (eq *Equation) C() map[string]map[string]bool { return eq.c }
+func (eq *Equation) M() map[string]string          { return eq.m }
+
 // Candidates locates node pair candidates for an isomorphism of sub in graph
 // which starts at the entry node.
 func Candidates(graph *dot.Graph, entry string, sub *graphs.SubGraph) (*Equation, error) {

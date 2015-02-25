@@ -168,12 +168,13 @@ func TestCandidates(t *testing.T) {
 	}
 }
 
-func TestSolve(t *testing.T) {
+func TestSolveBrute(t *testing.T) {
 	golden := []struct {
 		subPath   string
 		graphPath string
 		entry     string
 		wants     []map[string]string
+		err       string
 	}{
 		// i=0
 		{
@@ -194,6 +195,7 @@ func TestSolve(t *testing.T) {
 					"D": "D",
 				},
 			},
+			err: "",
 		},
 		// i=1
 		{
@@ -201,6 +203,7 @@ func TestSolve(t *testing.T) {
 			graphPath: "../testdata/c4_graphs/stmt.dot",
 			entry:     "85",
 			wants:     []map[string]string{nil},
+			err:       "unable to locate node pair mapping",
 		},
 		// i=2
 		{
@@ -208,6 +211,7 @@ func TestSolve(t *testing.T) {
 			graphPath: "../testdata/c4_graphs/stmt.dot",
 			entry:     "71",
 			wants:     []map[string]string{nil},
+			err:       "unable to locate node pair mapping",
 		},
 		// i=3
 		{
@@ -254,9 +258,12 @@ loop:
 			t.Errorf("i=%d: %v", i, err)
 			continue
 		}
-		m, err := eq.Solve(graph, sub)
-		if err != nil {
-			t.Errorf("i=%d: %v", i, err)
+		m, err := eq.SolveBrute(graph, sub)
+		if !sameError(err, g.err) {
+			t.Errorf("i=%d: error mismatch; expected %v, got %v", i, g.err, err)
+			continue
+		} else if err != nil {
+			// Expected error, check next test case.
 			continue
 		}
 		for _, want := range g.wants {
