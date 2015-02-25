@@ -441,7 +441,7 @@ func TestEquationSetPair(t *testing.T) {
 			// Expected error, check next test case.
 			continue
 		}
-		if !reflect.DeepEqual(g.want, g.in) {
+		if !reflect.DeepEqual(g.in, g.want) {
 			t.Errorf("i=%d: node pair equation mismatch; expected %v, got %v", i, g.want, g.in)
 		}
 	}
@@ -542,6 +542,270 @@ func TestEquationDup(t *testing.T) {
 		}
 		if !reflect.DeepEqual(got, g.want) {
 			t.Errorf("i=%d: unable to delete keys from equation copy", i)
+		}
+	}
+}
+
+func TestEquationSolveUnique(t *testing.T) {
+	golden := []struct {
+		in   *Equation
+		want *Equation
+		ok   bool
+		err  string
+	}{
+		// i=0
+		{
+			in: &Equation{
+				c: map[string]map[string]bool{
+					"A": map[string]bool{
+						"A": true,
+					},
+					"B": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"C": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+				},
+				m: map[string]string{
+					"D": "D",
+					"E": "E",
+				},
+			},
+			want: &Equation{
+				c: map[string]map[string]bool{
+					"B": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"C": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+				},
+				m: map[string]string{
+					"A": "A",
+					"D": "D",
+					"E": "E",
+				},
+			},
+			ok:  true,
+			err: "",
+		},
+		// i=1
+		{
+			in: &Equation{
+				c: map[string]map[string]bool{
+					"A": map[string]bool{
+						"A": true,
+					},
+					"B": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"C": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"D": map[string]bool{
+						"D": true,
+					},
+					"E": map[string]bool{
+						"E": true,
+					},
+				},
+				m: map[string]string{},
+			},
+			want: &Equation{
+				c: map[string]map[string]bool{
+					"B": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"C": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"D": map[string]bool{
+						"D": true,
+					},
+					"E": map[string]bool{
+						"E": true,
+					},
+				},
+				m: map[string]string{
+					"A": "A",
+				},
+			},
+			ok:  true,
+			err: "",
+		},
+		// i=2
+		{
+			in: &Equation{
+				c: map[string]map[string]bool{
+					"B": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"C": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"D": map[string]bool{
+						"D": true,
+					},
+					"E": map[string]bool{
+						"E": true,
+					},
+				},
+				m: map[string]string{
+					"A": "A",
+				},
+			},
+			want: &Equation{
+				c: map[string]map[string]bool{
+					"B": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"C": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"E": map[string]bool{
+						"E": true,
+					},
+				},
+				m: map[string]string{
+					"A": "A",
+					"D": "D",
+				},
+			},
+			ok:  true,
+			err: "",
+		},
+		// i=3
+		{
+			in: &Equation{
+				c: map[string]map[string]bool{
+					"B": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"C": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"E": map[string]bool{
+						"E": true,
+					},
+				},
+				m: map[string]string{
+					"A": "A",
+					"D": "D",
+				},
+			},
+			want: &Equation{
+				c: map[string]map[string]bool{
+					"B": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"C": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+				},
+				m: map[string]string{
+					"A": "A",
+					"D": "D",
+					"E": "E",
+				},
+			},
+			ok:  true,
+			err: "",
+		},
+		// i=4
+		{
+			in: &Equation{
+				c: map[string]map[string]bool{
+					"B": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"C": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+				},
+				m: map[string]string{
+					"A": "A",
+					"D": "D",
+					"E": "E",
+				},
+			},
+			want: &Equation{
+				c: map[string]map[string]bool{
+					"B": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+					"C": map[string]bool{
+						"B": true,
+						"C": true,
+					},
+				},
+				m: map[string]string{
+					"A": "A",
+					"D": "D",
+					"E": "E",
+				},
+			},
+			ok:  false,
+			err: "",
+		},
+		// i=5
+		{
+			in: &Equation{
+				c: map[string]map[string]bool{
+					"B": map[string]bool{
+						"0": true,
+					},
+					"C": map[string]bool{
+						"1": true,
+						"2": true,
+					},
+				},
+				m: map[string]string{
+					"A": "0",
+					"D": "3",
+					"E": "4",
+				},
+			},
+			want: nil,
+			ok:   false,
+			err:  `invalid mapping; sub node "A" and "B" both map to graph node "0"`,
+		},
+	}
+
+	for i, g := range golden {
+		ok, err := g.in.SolveUnique()
+		if !sameError(err, g.err) {
+			t.Errorf("i=%d: error mismatch; expected %v, got %v", i, g.err, err)
+			continue
+		} else if err != nil {
+			// Expected error, check next test case.
+			continue
+		}
+		if ok != g.ok {
+			t.Errorf("i=%d: ok mismatch; expected %v, got %v", i, g.ok, ok)
+			continue
+		}
+		if !reflect.DeepEqual(g.in, g.want) {
+			t.Errorf("i=%d: node pair equation mismatch; expected %v, got %v", i, g.want, g.in)
 		}
 	}
 }
