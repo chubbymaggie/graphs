@@ -7,7 +7,7 @@ import "github.com/mewkiz/pkg/errutil"
 // from all other node pairs in c.
 func (eq *Equation) SetPair(sname, gname string) error {
 	// Sanity check.
-	if key, ok := getKey(eq.m, gname); ok {
+	if key, ok := findKey(eq.m, gname); ok {
 		return errutil.Newf("invalid mapping; sub node %q and %q both map to graph node %q", key, sname, gname)
 	}
 
@@ -27,9 +27,9 @@ func (eq *Equation) SetPair(sname, gname string) error {
 	return nil
 }
 
-// getKey returns the first key in m which maps to the value val. The boolean
+// findKey returns the first key in m which maps to the value val. The boolean
 // value is true if such a key could be located, and false otherwise.
-func getKey(m map[string]string, val string) (key string, ok bool) {
+func findKey(m map[string]string, val string) (key string, ok bool) {
 	for key, x := range m {
 		if x == val {
 			return key, true

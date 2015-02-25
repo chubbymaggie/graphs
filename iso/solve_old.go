@@ -4,6 +4,7 @@ package iso
 import (
 	"fmt"
 	"log"
+	"sort"
 	"sync"
 
 	"github.com/davecgh/go-spew/spew"
@@ -185,9 +186,17 @@ func (eq *Equation) easiest() (string, error) {
 // pair is no longer a valid candidate it is removed from all other node pairs
 // in c.
 func (eq *Equation) SolveUnique() (ok bool, err error) {
-	for sname, candidates := range eq.c {
+	// Sort keys to make the algorithm deterministic.
+	var snames []string
+	for sname := range eq.c {
+		snames = append(snames, sname)
+	}
+	sort.Strings(snames)
+
+	for _, sname := range snames {
+		candidates := eq.c[sname]
 		if len(candidates) == 1 {
-			gname := pop(candidates)
+			gname := firstKey(candidates)
 			err := eq.SetPair(sname, gname)
 			if err != nil {
 				return false, errutil.Err(err)
@@ -199,8 +208,8 @@ func (eq *Equation) SolveUnique() (ok bool, err error) {
 	return false, nil
 }
 
-// pop returns the only key in m.
-func pop(m map[string]bool) string {
+// firstKey returns the only key in m.
+func firstKey(m map[string]bool) string {
 	if len(m) != 1 {
 		panic(fmt.Sprintf("invalid map length; expected 1, got %d", len(m)))
 	}
