@@ -810,6 +810,247 @@ func TestEquationSolveUnique(t *testing.T) {
 	}
 }
 
+func TestEquationIsValid(t *testing.T) {
+	golden := []struct {
+		subPath   string
+		graphPath string
+		eq        *Equation
+		want      bool
+	}{
+		// i=0
+		{
+			subPath:   "../testdata/primitives/if.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			eq: &Equation{
+				m: map[string]string{
+					"A": "71",
+					"B": "74",
+					"C": "75",
+				},
+			},
+			want: true,
+		},
+		// i=1
+		{
+			subPath:   "../testdata/primitives/if.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			eq: &Equation{
+				m: map[string]string{
+					"A": "17",
+					"B": "24",
+					"C": "32",
+				},
+			},
+			want: true,
+		},
+		// i=2
+		{
+			subPath:   "../testdata/primitives/if.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			eq: &Equation{
+				m: map[string]string{
+					"A": "89",
+					"B": "92",
+					"C": "93",
+				},
+			},
+			want: false,
+		},
+		// i=3
+		{
+			subPath:   "../testdata/primitives/if.dot",
+			graphPath: "../testdata/c4_graphs/stmt.dot",
+			eq: &Equation{
+				m: map[string]string{
+					"A": "94",
+					"B": "97",
+					"C": "98",
+				},
+			},
+			want: false,
+		},
+		// i=4
+		{
+			subPath:   "../testdata/primitives/if_else.dot",
+			graphPath: "../testdata/c4_graphs/expr.dot",
+			eq: &Equation{
+				m: map[string]string{
+					"A": "282",
+					"B": "292",
+					"C": "287",
+					"D": "299",
+				},
+			},
+			want: true,
+		},
+		// i=5
+		{
+			subPath:   "../testdata/primitives/if_else.dot",
+			graphPath: "../testdata/c4_graphs/expr.dot",
+			eq: &Equation{
+				m: map[string]string{
+					"A": "282",
+					"B": "287",
+					"C": "292",
+					"D": "299",
+				},
+			},
+			want: true,
+		},
+		// i=6
+		{
+			subPath:   "../testdata/primitives/if_else.dot",
+			graphPath: "../testdata/c4_graphs/next.dot",
+			eq: &Equation{
+				m: map[string]string{
+					"A": "438",
+					"B": "446",
+					"C": "443",
+					"D": "447",
+				},
+			},
+			want: true,
+		},
+		// i=7
+		{
+			subPath:   "../testdata/primitives/if_else.dot",
+			graphPath: "../testdata/c4_graphs/next.dot",
+			eq: &Equation{
+				m: map[string]string{
+					"A": "438",
+					"B": "443",
+					"C": "446",
+					"D": "447",
+				},
+			},
+			want: true,
+		},
+		// i=8
+		{
+			subPath:   "../testdata/primitives/if_else.dot",
+			graphPath: "../testdata/c4_graphs/next.dot",
+			eq: &Equation{
+				m: map[string]string{
+					"A": "487",
+					"B": "492",
+					"C": "495",
+					"D": "496",
+				},
+			},
+			want: true,
+		},
+		// i=9
+		{
+			subPath:   "../testdata/primitives/if_else.dot",
+			graphPath: "../testdata/c4_graphs/next.dot",
+			eq: &Equation{
+				m: map[string]string{
+					"A": "487",
+					"B": "495",
+					"C": "492",
+					"D": "496",
+				},
+			},
+			want: true,
+		},
+		// i=10
+		{
+			subPath:   "../testdata/primitives/if_else.dot",
+			graphPath: "../testdata/c4_graphs/next.dot",
+			eq: &Equation{
+				m: map[string]string{
+					"A": "124",
+					"B": "134",
+					"C": "126",
+					"D": "145",
+				},
+			},
+			want: false,
+		},
+		// i=11
+		{
+			subPath:   "../testdata/primitives/list.dot",
+			graphPath: "../testdata/c4_graphs/main.dot",
+			eq: &Equation{
+				m: map[string]string{
+					"A": "740",
+					"B": "760",
+				},
+			},
+			want: true,
+		},
+		// i=12
+		{
+			subPath:   "../testdata/primitives/list.dot",
+			graphPath: "../testdata/c4_graphs/main.dot",
+			eq: &Equation{
+				m: map[string]string{
+					"A": "761",
+					"B": "762",
+				},
+			},
+			want: false,
+		},
+		// i=13
+		{
+			subPath:   "../testdata/primitives/while.dot",
+			graphPath: "../testdata/c4_graphs/expr.dot",
+			eq: &Equation{
+				m: map[string]string{
+					"A": "191",
+					"B": "194",
+					"C": "196",
+				},
+			},
+			want: true,
+		},
+		// i=14
+		{
+			subPath:   "../testdata/primitives/while.dot",
+			graphPath: "../testdata/c4_graphs/expr.dot",
+			eq: &Equation{
+				m: map[string]string{
+					"A": "370",
+					"B": "378",
+					"C": "374",
+				},
+			},
+			want: false,
+		},
+		// i=15
+		{
+			subPath:   "../testdata/primitives/while.dot",
+			graphPath: "../testdata/c4_graphs/expr.dot",
+			eq: &Equation{
+				m: map[string]string{
+					"A": "526",
+					"B": "530",
+					"C": "539",
+				},
+			},
+			want: false,
+		},
+	}
+
+	for i, g := range golden {
+		sub, err := graphs.ParseSubGraph(g.subPath)
+		if err != nil {
+			t.Errorf("i=%d: %v", i, err)
+			continue
+		}
+		graph, err := dot.ParseFile(g.graphPath)
+		if err != nil {
+			t.Errorf("i=%d: %v", i, err)
+			continue
+		}
+		got := g.eq.IsValid(graph, sub)
+		if got != g.want {
+			t.Errorf("i=%d: ok mismatch; expected %v, got %v", i, g.want, got)
+			continue
+		}
+	}
+}
+
 // sameError returns true if err is represented by the string s, and false
 // otherwise. Some error messages contains "file:line" prefixes and suffixes
 // from external functions, e.g.

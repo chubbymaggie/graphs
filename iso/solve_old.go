@@ -42,7 +42,7 @@ func (eq *Equation) Solve(graph *dot.Graph, sub *graphs.SubGraph) (m map[string]
 // mapping is sent to the out channel if successful, and a nil mapping
 // otherwise.
 func (eq *Equation) solve(graph *dot.Graph, sub *graphs.SubGraph, out chan map[string]string) {
-	for !eq.IsSolved(graph, sub) {
+	for !eq.IsValid(graph, sub) {
 		// TODO: Remove debug output.
 		fmt.Println("___ [ before unique pairs ] _________")
 		fmt.Println()
@@ -157,7 +157,7 @@ func brute(graph *dot.Graph, sub *graphs.SubGraph, eq *Equation, sname, gname st
 	if len(eq.c) == 0 {
 		out <- nil
 	}
-	if eq.IsSolved(graph, sub) {
+	if eq.IsValid(graph, sub) {
 		out <- eq.m
 	}
 	wg.Done()
