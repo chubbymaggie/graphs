@@ -1,11 +1,10 @@
 package iso
 
 import (
-	"log"
+	"fmt"
 	"sort"
 
 	"github.com/mewfork/dot"
-	"github.com/mewkiz/pkg/errutil"
 	"github.com/mewrev/graphs"
 )
 
@@ -33,15 +32,11 @@ func (eq *Equation) IsValid(graph *dot.Graph, sub *graphs.SubGraph) bool {
 		gname := eq.m[sname]
 		s, ok := sub.Nodes.Lookup[sname]
 		if !ok {
-			err := errutil.Newf("unable to locate node %q in sub", sname)
-			log.Println(err)
-			return false
+			panic(fmt.Sprintf("unable to locate node %q in sub", sname))
 		}
 		g, ok := graph.Nodes.Lookup[gname]
 		if !ok {
-			err := errutil.Newf("unable to locate node %q in graph", gname)
-			log.Println(err)
-			return false
+			panic(fmt.Sprintf("unable to locate node %q in graph", gname))
 		}
 
 		// Verify predecessors.

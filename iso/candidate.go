@@ -1,6 +1,8 @@
 package iso
 
 import (
+	"fmt"
+
 	"github.com/mewfork/dot"
 	"github.com/mewkiz/pkg/errutil"
 	"github.com/mewrev/graphs"
@@ -24,7 +26,7 @@ func Candidates(graph *dot.Graph, entry string, sub *graphs.SubGraph) (*Equation
 	}
 	s, ok := sub.Nodes.Lookup[sub.Entry()]
 	if !ok {
-		return nil, errutil.Newf("unable to locate entry node %q in sub", sub.Entry())
+		panic(fmt.Sprintf("unable to locate entry node %q in sub", sub.Entry()))
 	}
 	if !isPotential(g, s, sub) {
 		return nil, errutil.Newf("invalid entry node candidate %q; expected %d successors, got %d", g.Name, len(s.Succs), len(g.Succs))
