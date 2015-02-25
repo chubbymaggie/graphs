@@ -4,7 +4,6 @@ package iso
 import (
 	"fmt"
 	"log"
-	"sort"
 	"sync"
 
 	"github.com/davecgh/go-spew/spew"
@@ -179,42 +178,4 @@ func (eq *Equation) easiest() (string, error) {
 		return "", errutil.Newf("too few candidates for brute force; expected > 2, got %d", min)
 	}
 	return easiest, nil
-}
-
-// SolveUnique tries to locate a unique node pair in c. If successful the node
-// pair is removed from c and stored in m. As the graph node name of the node
-// pair is no longer a valid candidate it is removed from all other node pairs
-// in c.
-func (eq *Equation) SolveUnique() (ok bool, err error) {
-	// Sort keys to make the algorithm deterministic.
-	var snames []string
-	for sname := range eq.c {
-		snames = append(snames, sname)
-	}
-	sort.Strings(snames)
-
-	for _, sname := range snames {
-		candidates := eq.c[sname]
-		if len(candidates) == 1 {
-			gname := firstKey(candidates)
-			err := eq.SetPair(sname, gname)
-			if err != nil {
-				return false, errutil.Err(err)
-			}
-			return true, nil
-		}
-	}
-
-	return false, nil
-}
-
-// firstKey returns the only key in m.
-func firstKey(m map[string]bool) string {
-	if len(m) != 1 {
-		panic(fmt.Sprintf("invalid map length; expected 1, got %d", len(m)))
-	}
-	for key := range m {
-		return key
-	}
-	panic("unreachable")
 }
