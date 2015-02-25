@@ -15,6 +15,7 @@ import (
 	"github.com/mewkiz/pkg/errutil"
 	"github.com/mewkiz/pkg/pathutil"
 	"github.com/mewrev/graphs"
+	"github.com/mewrev/graphs/iso"
 )
 
 var (
@@ -79,7 +80,7 @@ func merge(graphPath, subPath string) error {
 	if len(flagStart) > 0 {
 		// Merge an isomorphism of sub in graph which starts at the node
 		// specified by the "-start" flag.
-		m, ok := graphs.Isomorphism(graph, flagStart, sub)
+		m, ok := iso.Isomorphism(graph, flagStart, sub)
 		if ok {
 			found = true
 			printMapping(graph, sub, m)
@@ -91,7 +92,7 @@ func merge(graphPath, subPath string) error {
 	} else {
 		// Merge all isomorphisms of sub in graph.
 		for {
-			m, ok := graphs.Search(graph, sub)
+			m, ok := iso.Search(graph, sub)
 			if !ok {
 				break
 			}
