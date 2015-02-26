@@ -1,0 +1,7 @@
+digraph if_return {
+	A [label="entry"]
+	B [label="return"]
+	C [label="exit"]
+	A->B [label="true"]
+	A->C [label="false"]
+}
