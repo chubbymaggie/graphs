@@ -16,6 +16,7 @@ import (
 	"github.com/mewkiz/pkg/pathutil"
 	"github.com/mewrev/graphs"
 	"github.com/mewrev/graphs/iso"
+	"github.com/mewrev/graphs/merge"
 )
 
 var (
@@ -56,15 +57,15 @@ func main() {
 		os.Exit(1)
 	}
 	subPath, graphPath := flag.Arg(0), flag.Arg(1)
-	err := merge(graphPath, subPath)
+	err := locateAndMerge(graphPath, subPath)
 	if err != nil {
 		log.Fatalln(err)
 	}
 }
 
-// merge parses the provided graphs and tries to merge isomorphisms of the
-// subgraph in the graph into single nodes.
-func merge(graphPath, subPath string) error {
+// locateAndMerge parses the provided graphs and tries to merge isomorphisms of
+// the subgraph in the graph into single nodes.
+func locateAndMerge(graphPath, subPath string) error {
 	// Parse graphs.
 	graph, err := dot.ParseFile(graphPath)
 	if err != nil {
@@ -84,10 +85,10 @@ func merge(graphPath, subPath string) error {
 		if ok {
 			found = true
 			printMapping(graph, sub, m)
-		}
-		err := replace(graph, m, sub)
-		if err != nil {
-			return errutil.Err(err)
+			_, err := merge.Merge(graph, m, sub)
+			if err != nil {
+				return errutil.Err(err)
+			}
 		}
 	} else {
 		// Merge all isomorphisms of sub in graph.
@@ -98,7 +99,7 @@ func merge(graphPath, subPath string) error {
 			}
 			found = true
 			printMapping(graph, sub, m)
-			err := replace(graph, m, sub)
+			_, err := merge.Merge(graph, m, sub)
 			if err != nil {
 				return errutil.Err(err)
 			}
@@ -133,33 +134,6 @@ func printMapping(graph *dot.Graph, sub *graphs.SubGraph, m map[string]string) {
 	}
 }
 
-// replace replaces the nodes of the isomorphism of sub in graph with a single
-// node.
-func replace(graph *dot.Graph, m map[string]string, sub *graphs.SubGraph) error {
-	var nodes []*dot.Node
-	for _, gname := range m {
-		node, ok := graph.Nodes.Lookup[gname]
-		if !ok {
-			return errutil.Newf("unable to locate mapping for node %q", gname)
-		}
-		nodes = append(nodes, node)
-	}
-	name := uniqName(graph, sub.Name)
-	entry, ok := graph.Nodes.Lookup[m[sub.Entry()]]
-	if !ok {
-		return errutil.Newf("unable to locate mapping for entry node %q", sub.Entry())
-	}
-	exit, ok := graph.Nodes.Lookup[m[sub.Exit()]]
-	if !ok {
-		return errutil.Newf("unable to locate mapping for exit node %q", sub.Exit())
-	}
-	err := graph.Replace(nodes, name, entry, exit)
-	if err != nil {
-		return errutil.Err(err)
-	}
-	return nil
-}
-
 // dump stores the graph as a DOT file and an image representation of the graph
 // as a PNG file with filenames based on "-o" flag.
 func dump(graph *dot.Graph) error {
@@ -189,15 +163,4 @@ func dump(graph *dot.Graph) error {
 	}
 
 	return nil
-}
-
-// uniqName returns name with a uniq numeric suffix.
-func uniqName(graph *dot.Graph, name string) string {
-	for id := 0; ; id++ {
-		s := fmt.Sprintf("%s%d", name, id)
-		_, ok := graph.Nodes.Lookup[s]
-		if !ok {
-			return s
-		}
-	}
 }
