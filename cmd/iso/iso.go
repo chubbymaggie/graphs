@@ -102,7 +102,7 @@ func printMapping(graph *dot.Graph, sub *graphs.SubGraph, m map[string]string) {
 		snames = append(snames, sname)
 	}
 	sort.Strings(snames)
-	fmt.Printf("Isomorphism found at node %q:\n", entry)
+	fmt.Printf("Isomorphism of %q found at node %q:\n", sub.Name, entry)
 	for _, sname := range snames {
 		fmt.Printf("   %q=%q\n", sname, m[sname])
 	}

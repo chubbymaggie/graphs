@@ -1,8 +1,6 @@
 digraph post_loop {
 	A [label="entry"]
-	B
-	C [label="exit"]
-	A->B [label="true"]
-	B->A
-	B->C [label="false"]
+	B [label="exit"]
+	A->A [label="true"]
+	A->B [label="false"]
 }

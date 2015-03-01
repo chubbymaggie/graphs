@@ -32,11 +32,11 @@ go get github.com/mewrev/graphs/cmd/iso
 ```bash
 iso if.dot c4_graphs/stmt.dot
 // Output:
-// Isomorphism found at node "17":
+// Isomorphism of "if" found at node "17":
 //    "A"="17"
 //    "B"="24"
 //    "C"="32"
-// Isomorphism found at node "71":
+// Isomorphism of "if" found at node "71":
 //    "A"="71"
 //    "B"="74"
 //    "C"="75"
