@@ -1,3 +1,8 @@
+//go:generate usagen merge
+//go:generate mv z_usage.go z_usage.bak
+//go:generate mango -plain merge.go
+//go:generate mv z_usage.bak z_usage.go
+
 // merge is a tool which merges subgraph isomorphisms in graphs into single
 // nodes.
 package main

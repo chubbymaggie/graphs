@@ -1,3 +1,8 @@
+//go:generate usagen iso
+//go:generate mv z_usage.go z_usage.bak
+//go:generate mango -plain iso.go
+//go:generate mv z_usage.bak z_usage.go
+
 // iso is a tool which locates subgraph isomorphisms in graphs.
 package main
 
