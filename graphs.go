@@ -1,4 +1,4 @@
-// Package graphs provides subgraph data structures.
+// Package graphs provides access to subgraph data structures.
 package graphs
 
 import (
