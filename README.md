@@ -27,10 +27,10 @@ go get github.com/mewrev/graphs/cmd/iso
 
 ### Examples
 
-1) Locate all isomorphisms of the subgraph [if.dot](testdata/if.dot) in the graph [stmt.dot](testdata/c4_graphs/stmt.dot).
+1) Locate all isomorphisms of the subgraph [if.dot](testdata/primitives/if.dot) in the graph [stmt.dot](testdata/c4_graphs/stmt.dot).
 
 ```bash
-iso if.dot c4_graphs/stmt.dot
+iso primitives/if.dot c4_graphs/stmt.dot
 // Output:
 // Isomorphism of "if" found at node "17":
 //    "A"="17"
@@ -43,9 +43,9 @@ iso if.dot c4_graphs/stmt.dot
 ```
 
 SUB:
-* [if.dot](testdata/if.dot):
+* [if.dot](testdata/primitives/if.dot):
 
-![if.dot subgraph](https://raw.githubusercontent.com/mewrev/graphs/master/testdata/if.png)
+![if.dot subgraph](https://raw.githubusercontent.com/mewrev/graphs/master/testdata/primitives/if.png)
 
 GRAPH:
 * [stmt.dot](testdata/c4_graphs/stmt.dot):
