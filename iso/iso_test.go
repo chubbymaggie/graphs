@@ -63,7 +63,7 @@ func TestCandidates(t *testing.T) {
 		},
 		// i=2
 		{
-			subPath:   "../testdata/primitives/while.dot",
+			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
 			entry:     "71",
 			want: map[string]map[string]bool{
@@ -81,7 +81,7 @@ func TestCandidates(t *testing.T) {
 		},
 		// i=3
 		{
-			subPath:   "../testdata/primitives/while.dot",
+			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
 			entry:     "89",
 			want: map[string]map[string]bool{
@@ -207,7 +207,7 @@ func TestSolveBrute(t *testing.T) {
 		},
 		// i=2
 		{
-			subPath:   "../testdata/primitives/while.dot",
+			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
 			entry:     "71",
 			wants:     []map[string]string{nil},
@@ -215,7 +215,7 @@ func TestSolveBrute(t *testing.T) {
 		},
 		// i=3
 		{
-			subPath:   "../testdata/primitives/while.dot",
+			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
 			entry:     "89",
 			wants: []map[string]string{
@@ -1000,7 +1000,7 @@ func TestEquationIsValid(t *testing.T) {
 		},
 		// i=13
 		{
-			subPath:   "../testdata/primitives/while.dot",
+			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/expr.dot",
 			eq: &Equation{
 				m: map[string]string{
@@ -1013,7 +1013,7 @@ func TestEquationIsValid(t *testing.T) {
 		},
 		// i=14
 		{
-			subPath:   "../testdata/primitives/while.dot",
+			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/expr.dot",
 			eq: &Equation{
 				m: map[string]string{
@@ -1026,7 +1026,7 @@ func TestEquationIsValid(t *testing.T) {
 		},
 		// i=15
 		{
-			subPath:   "../testdata/primitives/while.dot",
+			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/expr.dot",
 			eq: &Equation{
 				m: map[string]string{
@@ -1079,7 +1079,7 @@ func TestEquationIsValid(t *testing.T) {
 		},
 		// i=19
 		{
-			subPath:   "../testdata/primitives/while.dot",
+			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
 			eq: &Equation{
 				m: map[string]string{
@@ -1092,7 +1092,7 @@ func TestEquationIsValid(t *testing.T) {
 		},
 		// i=20
 		{
-			subPath:   "../testdata/primitives/while.dot",
+			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
 			eq: &Equation{
 				m: map[string]string{
@@ -1240,7 +1240,7 @@ func TestIsomorphism(t *testing.T) {
 		},
 		// i=10
 		{
-			subPath:   "../testdata/primitives/while.dot",
+			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/expr.dot",
 			entry:     "191",
 			m: map[string]string{
@@ -1252,7 +1252,7 @@ func TestIsomorphism(t *testing.T) {
 		},
 		// i=11
 		{
-			subPath:   "../testdata/primitives/while.dot",
+			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/expr.dot",
 			entry:     "370",
 			m:         nil,
@@ -1260,7 +1260,7 @@ func TestIsomorphism(t *testing.T) {
 		},
 		// i=12
 		{
-			subPath:   "../testdata/primitives/while.dot",
+			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/expr.dot",
 			entry:     "526",
 			m:         nil,
@@ -1292,7 +1292,7 @@ func TestIsomorphism(t *testing.T) {
 		},
 		// i=16
 		{
-			subPath:   "../testdata/primitives/while.dot",
+			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
 			entry:     "39",
 			m:         nil,
@@ -1359,7 +1359,7 @@ func TestSearch(t *testing.T) {
 		},
 		// i=3
 		{
-			subPath:   "../testdata/primitives/while.dot",
+			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
 			m: map[string]string{
 				"A": "89",
@@ -1404,7 +1404,7 @@ func TestSearch(t *testing.T) {
 		},
 		// i=7
 		{
-			subPath:   "../testdata/primitives/while.dot",
+			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/expr.dot",
 			m: map[string]string{
 				"A": "191",
@@ -1449,7 +1449,7 @@ func TestSearch(t *testing.T) {
 		},
 		// i=11
 		{
-			subPath:   "../testdata/primitives/while.dot",
+			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/next.dot",
 			m:         nil,
 			ok:        false,
@@ -1490,7 +1490,7 @@ func TestSearch(t *testing.T) {
 		},
 		// i=15
 		{
-			subPath:   "../testdata/primitives/while.dot",
+			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/main.dot",
 			m: map[string]string{
 				"A": "190",
