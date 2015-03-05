@@ -23,18 +23,18 @@ func TestCandidates(t *testing.T) {
 			graphPath: "../testdata/primitives/if_else.dot",
 			entry:     "A",
 			want: map[string]map[string]bool{
-				"A": map[string]bool{
+				"A": {
 					"A": true,
 				},
-				"B": map[string]bool{
+				"B": {
 					"B": true,
 					"C": true,
 				},
-				"C": map[string]bool{
+				"C": {
 					"B": true,
 					"C": true,
 				},
-				"D": map[string]bool{
+				"D": {
 					"D": true,
 				},
 			},
@@ -46,16 +46,16 @@ func TestCandidates(t *testing.T) {
 			graphPath: "../testdata/c4_graphs/stmt.dot",
 			entry:     "85",
 			want: map[string]map[string]bool{
-				"A": map[string]bool{
+				"A": {
 					"85": true,
 				},
-				"B": map[string]bool{
+				"B": {
 					"88": true,
 				},
-				"C": map[string]bool{
+				"C": {
 					"88": true,
 				},
-				"D": map[string]bool{
+				"D": {
 					"89": true,
 				},
 			},
@@ -67,13 +67,13 @@ func TestCandidates(t *testing.T) {
 			graphPath: "../testdata/c4_graphs/stmt.dot",
 			entry:     "71",
 			want: map[string]map[string]bool{
-				"A": map[string]bool{
+				"A": {
 					"71": true,
 				},
-				"B": map[string]bool{
+				"B": {
 					"74": true,
 				},
-				"C": map[string]bool{
+				"C": {
 					"74": true,
 				},
 			},
@@ -85,14 +85,14 @@ func TestCandidates(t *testing.T) {
 			graphPath: "../testdata/c4_graphs/stmt.dot",
 			entry:     "89",
 			want: map[string]map[string]bool{
-				"A": map[string]bool{
+				"A": {
 					"89": true,
 				},
-				"B": map[string]bool{
+				"B": {
 					"92": true,
 					"93": true,
 				},
-				"C": map[string]bool{
+				"C": {
 					"92": true,
 					"93": true,
 				},
@@ -105,13 +105,13 @@ func TestCandidates(t *testing.T) {
 			graphPath: "../testdata/c4_graphs/stmt.dot",
 			entry:     "71",
 			want: map[string]map[string]bool{
-				"A": map[string]bool{
+				"A": {
 					"71": true,
 				},
-				"B": map[string]bool{
+				"B": {
 					"74": true,
 				},
-				"C": map[string]bool{
+				"C": {
 					"75": true,
 				},
 			},
@@ -286,18 +286,18 @@ func TestEquationSetPair(t *testing.T) {
 		{
 			in: &Equation{
 				c: map[string]map[string]bool{
-					"A": map[string]bool{
+					"A": {
 						"A": true,
 					},
-					"B": map[string]bool{
+					"B": {
 						"B": true,
 						"C": true,
 					},
-					"C": map[string]bool{
+					"C": {
 						"B": true,
 						"C": true,
 					},
-					"D": map[string]bool{
+					"D": {
 						"D": true,
 					},
 				},
@@ -306,15 +306,15 @@ func TestEquationSetPair(t *testing.T) {
 			sname: "A", gname: "A",
 			want: &Equation{
 				c: map[string]map[string]bool{
-					"B": map[string]bool{
+					"B": {
 						"B": true,
 						"C": true,
 					},
-					"C": map[string]bool{
+					"C": {
 						"B": true,
 						"C": true,
 					},
-					"D": map[string]bool{
+					"D": {
 						"D": true,
 					},
 				},
@@ -328,15 +328,15 @@ func TestEquationSetPair(t *testing.T) {
 		{
 			in: &Equation{
 				c: map[string]map[string]bool{
-					"B": map[string]bool{
+					"B": {
 						"B": true,
 						"C": true,
 					},
-					"C": map[string]bool{
+					"C": {
 						"B": true,
 						"C": true,
 					},
-					"D": map[string]bool{
+					"D": {
 						"D": true,
 					},
 				},
@@ -347,10 +347,10 @@ func TestEquationSetPair(t *testing.T) {
 			sname: "B", gname: "B",
 			want: &Equation{
 				c: map[string]map[string]bool{
-					"C": map[string]bool{
+					"C": {
 						"C": true,
 					},
-					"D": map[string]bool{
+					"D": {
 						"D": true,
 					},
 				},
@@ -365,15 +365,15 @@ func TestEquationSetPair(t *testing.T) {
 		{
 			in: &Equation{
 				c: map[string]map[string]bool{
-					"B": map[string]bool{
+					"B": {
 						"B": true,
 						"C": true,
 					},
-					"C": map[string]bool{
+					"C": {
 						"B": true,
 						"C": true,
 					},
-					"D": map[string]bool{
+					"D": {
 						"D": true,
 					},
 				},
@@ -384,10 +384,10 @@ func TestEquationSetPair(t *testing.T) {
 			sname: "B", gname: "C",
 			want: &Equation{
 				c: map[string]map[string]bool{
-					"C": map[string]bool{
+					"C": {
 						"B": true,
 					},
-					"D": map[string]bool{
+					"D": {
 						"D": true,
 					},
 				},
@@ -402,15 +402,15 @@ func TestEquationSetPair(t *testing.T) {
 		{
 			in: &Equation{
 				c: map[string]map[string]bool{
-					"A": map[string]bool{
+					"A": {
 						"A": true,
 						"D": true,
 					},
-					"C": map[string]bool{
+					"C": {
 						"A": true,
 						"C": true,
 					},
-					"D": map[string]bool{
+					"D": {
 						"D": true,
 					},
 				},
@@ -424,7 +424,7 @@ func TestEquationSetPair(t *testing.T) {
 		{
 			in: &Equation{
 				c: map[string]map[string]bool{
-					"A": map[string]bool{
+					"A": {
 						"0": true,
 						"1": true,
 					},
@@ -464,14 +464,14 @@ func TestEquationDup(t *testing.T) {
 		{
 			in: &Equation{
 				c: map[string]map[string]bool{
-					"A": map[string]bool{
+					"A": {
 						"A": true,
 					},
-					"B": map[string]bool{
+					"B": {
 						"B": true,
 						"C": true,
 					},
-					"C": map[string]bool{
+					"C": {
 						"B": true,
 						"C": true,
 					},
@@ -484,11 +484,11 @@ func TestEquationDup(t *testing.T) {
 			ckey: "A", mkey: "D",
 			want: &Equation{
 				c: map[string]map[string]bool{
-					"B": map[string]bool{
+					"B": {
 						"B": true,
 						"C": true,
 					},
-					"C": map[string]bool{
+					"C": {
 						"B": true,
 						"C": true,
 					},
@@ -502,11 +502,11 @@ func TestEquationDup(t *testing.T) {
 		{
 			in: &Equation{
 				c: map[string]map[string]bool{
-					"B": map[string]bool{
+					"B": {
 						"B": true,
 						"C": true,
 					},
-					"C": map[string]bool{
+					"C": {
 						"B": true,
 						"C": true,
 					},
@@ -520,7 +520,7 @@ func TestEquationDup(t *testing.T) {
 			ckey: "B", mkey: "E",
 			want: &Equation{
 				c: map[string]map[string]bool{
-					"C": map[string]bool{
+					"C": {
 						"B": true,
 						"C": true,
 					},
@@ -564,14 +564,14 @@ func TestEquationSolveUnique(t *testing.T) {
 		{
 			in: &Equation{
 				c: map[string]map[string]bool{
-					"A": map[string]bool{
+					"A": {
 						"A": true,
 					},
-					"B": map[string]bool{
+					"B": {
 						"B": true,
 						"C": true,
 					},
-					"C": map[string]bool{
+					"C": {
 						"B": true,
 						"C": true,
 					},
@@ -583,11 +583,11 @@ func TestEquationSolveUnique(t *testing.T) {
 			},
 			want: &Equation{
 				c: map[string]map[string]bool{
-					"B": map[string]bool{
+					"B": {
 						"B": true,
 						"C": true,
 					},
-					"C": map[string]bool{
+					"C": {
 						"B": true,
 						"C": true,
 					},
@@ -605,21 +605,21 @@ func TestEquationSolveUnique(t *testing.T) {
 		{
 			in: &Equation{
 				c: map[string]map[string]bool{
-					"A": map[string]bool{
+					"A": {
 						"A": true,
 					},
-					"B": map[string]bool{
+					"B": {
 						"B": true,
 						"C": true,
 					},
-					"C": map[string]bool{
+					"C": {
 						"B": true,
 						"C": true,
 					},
-					"D": map[string]bool{
+					"D": {
 						"D": true,
 					},
-					"E": map[string]bool{
+					"E": {
 						"E": true,
 					},
 				},
@@ -627,18 +627,18 @@ func TestEquationSolveUnique(t *testing.T) {
 			},
 			want: &Equation{
 				c: map[string]map[string]bool{
-					"B": map[string]bool{
+					"B": {
 						"B": true,
 						"C": true,
 					},
-					"C": map[string]bool{
+					"C": {
 						"B": true,
 						"C": true,
 					},
-					"D": map[string]bool{
+					"D": {
 						"D": true,
 					},
-					"E": map[string]bool{
+					"E": {
 						"E": true,
 					},
 				},
@@ -653,18 +653,18 @@ func TestEquationSolveUnique(t *testing.T) {
 		{
 			in: &Equation{
 				c: map[string]map[string]bool{
-					"B": map[string]bool{
+					"B": {
 						"B": true,
 						"C": true,
 					},
-					"C": map[string]bool{
+					"C": {
 						"B": true,
 						"C": true,
 					},
-					"D": map[string]bool{
+					"D": {
 						"D": true,
 					},
-					"E": map[string]bool{
+					"E": {
 						"E": true,
 					},
 				},
@@ -674,15 +674,15 @@ func TestEquationSolveUnique(t *testing.T) {
 			},
 			want: &Equation{
 				c: map[string]map[string]bool{
-					"B": map[string]bool{
+					"B": {
 						"B": true,
 						"C": true,
 					},
-					"C": map[string]bool{
+					"C": {
 						"B": true,
 						"C": true,
 					},
-					"E": map[string]bool{
+					"E": {
 						"E": true,
 					},
 				},
@@ -698,15 +698,15 @@ func TestEquationSolveUnique(t *testing.T) {
 		{
 			in: &Equation{
 				c: map[string]map[string]bool{
-					"B": map[string]bool{
+					"B": {
 						"B": true,
 						"C": true,
 					},
-					"C": map[string]bool{
+					"C": {
 						"B": true,
 						"C": true,
 					},
-					"E": map[string]bool{
+					"E": {
 						"E": true,
 					},
 				},
@@ -717,11 +717,11 @@ func TestEquationSolveUnique(t *testing.T) {
 			},
 			want: &Equation{
 				c: map[string]map[string]bool{
-					"B": map[string]bool{
+					"B": {
 						"B": true,
 						"C": true,
 					},
-					"C": map[string]bool{
+					"C": {
 						"B": true,
 						"C": true,
 					},
@@ -739,11 +739,11 @@ func TestEquationSolveUnique(t *testing.T) {
 		{
 			in: &Equation{
 				c: map[string]map[string]bool{
-					"B": map[string]bool{
+					"B": {
 						"B": true,
 						"C": true,
 					},
-					"C": map[string]bool{
+					"C": {
 						"B": true,
 						"C": true,
 					},
@@ -756,11 +756,11 @@ func TestEquationSolveUnique(t *testing.T) {
 			},
 			want: &Equation{
 				c: map[string]map[string]bool{
-					"B": map[string]bool{
+					"B": {
 						"B": true,
 						"C": true,
 					},
-					"C": map[string]bool{
+					"C": {
 						"B": true,
 						"C": true,
 					},
@@ -778,10 +778,10 @@ func TestEquationSolveUnique(t *testing.T) {
 		{
 			in: &Equation{
 				c: map[string]map[string]bool{
-					"B": map[string]bool{
+					"B": {
 						"0": true,
 					},
-					"C": map[string]bool{
+					"C": {
 						"1": true,
 						"2": true,
 					},
