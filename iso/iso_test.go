@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/decomp/graphs"
+	"decomp.org/graphs"
 	"github.com/mewfork/dot"
 )
 
@@ -1527,7 +1527,7 @@ func TestSearch(t *testing.T) {
 // otherwise. Some error messages contains "file:line" prefixes and suffixes
 // from external functions, e.g.
 //
-//    github.com/decomp/graphs/iso.Candidates (solve.go:53): error: unable to locate entry node "foo" in graph
+//    decomp.org/graphs/iso.Candidates (solve.go:53): error: unable to locate entry node "foo" in graph
 //    unable to parse integer constant "foo"; strconv.ParseInt: parsing "foo": invalid syntax`
 //
 // For this reason s matches the error if it is a non-empty substring of err.

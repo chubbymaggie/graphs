@@ -4,7 +4,7 @@ package iso
 import (
 	"sort"
 
-	"github.com/decomp/graphs"
+	"decomp.org/graphs"
 	"github.com/mewfork/dot"
 )
 

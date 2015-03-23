@@ -6,7 +6,7 @@ This project is a *work in progress*. The implementation is *incomplete* and sub
 
 [![Build Status](https://travis-ci.org/decomp/graphs.svg?branch=master)](https://travis-ci.org/decomp/graphs)
 [![Coverage Status](https://img.shields.io/coveralls/decomp/graphs.svg)](https://coveralls.io/r/decomp/graphs?branch=master)
-[![GoDoc](https://godoc.org/github.com/decomp/graphs?status.svg)](https://godoc.org/github.com/decomp/graphs)
+[![GoDoc](https://godoc.org/decomp.org/graphs?status.svg)](https://godoc.org/decomp.org/graphs)
 
 The graphs project implements subgraph isomorphism search algorithms.
 
@@ -17,7 +17,7 @@ The graphs project implements subgraph isomorphism search algorithms.
 ### Installation
 
 ```shell
-go get github.com/decomp/graphs/cmd/iso
+go get decomp.org/graphs/cmd/iso
 ```
 
 ### Usage

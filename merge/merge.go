@@ -4,7 +4,7 @@ package merge
 import (
 	"fmt"
 
-	"github.com/decomp/graphs"
+	"decomp.org/graphs"
 	"github.com/mewfork/dot"
 	"github.com/mewkiz/pkg/errutil"
 )

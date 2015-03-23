@@ -16,9 +16,9 @@ import (
 	"os/exec"
 	"sort"
 
-	"github.com/decomp/graphs"
-	"github.com/decomp/graphs/iso"
-	"github.com/decomp/graphs/merge"
+	"decomp.org/graphs"
+	"decomp.org/graphs/iso"
+	"decomp.org/graphs/merge"
 	"github.com/mewfork/dot"
 	"github.com/mewkiz/pkg/errutil"
 	"github.com/mewkiz/pkg/pathutil"
