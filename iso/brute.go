@@ -3,7 +3,7 @@ package iso
 import (
 	"sort"
 
-	"decomp.org/graphs"
+	"decomp.org/x/graphs"
 	"github.com/mewfork/dot"
 	"github.com/mewkiz/pkg/errutil"
 )

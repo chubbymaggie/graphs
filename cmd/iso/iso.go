@@ -13,8 +13,8 @@ import (
 	"os"
 	"sort"
 
-	"decomp.org/graphs"
-	"decomp.org/graphs/iso"
+	"decomp.org/x/graphs"
+	"decomp.org/x/graphs/iso"
 	"github.com/mewfork/dot"
 	"github.com/mewkiz/pkg/errutil"
 )
