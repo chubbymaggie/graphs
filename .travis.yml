@@ -16,6 +16,9 @@ before_install:
   - go get github.com/mattn/goveralls
 
 install:
+  - mkdir -p $HOME/gopath/src/decomp.org/x/
+  - mv . $HOME/gopath/src/decomp.org/x/
+  - cd $HOME/gopath/src/decomp.org/x/graphs/
   - go get ./...
 
 before_script:
