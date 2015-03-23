@@ -4,9 +4,9 @@ This project is a *work in progress*. The implementation is *incomplete* and sub
 
 # graphs
 
-[![Build Status](https://travis-ci.org/mewrev/graphs.svg?branch=master)](https://travis-ci.org/mewrev/graphs)
-[![Coverage Status](https://img.shields.io/coveralls/mewrev/graphs.svg)](https://coveralls.io/r/mewrev/graphs?branch=master)
-[![GoDoc](https://godoc.org/github.com/mewrev/graphs?status.svg)](https://godoc.org/github.com/mewrev/graphs)
+[![Build Status](https://travis-ci.org/decomp/graphs.svg?branch=master)](https://travis-ci.org/decomp/graphs)
+[![Coverage Status](https://img.shields.io/coveralls/decomp/graphs.svg)](https://coveralls.io/r/decomp/graphs?branch=master)
+[![GoDoc](https://godoc.org/github.com/decomp/graphs?status.svg)](https://godoc.org/github.com/decomp/graphs)
 
 The graphs project implements subgraph isomorphism search algorithms.
 
@@ -17,7 +17,7 @@ The graphs project implements subgraph isomorphism search algorithms.
 ### Installation
 
 ```shell
-go get github.com/mewrev/graphs/cmd/iso
+go get github.com/decomp/graphs/cmd/iso
 ```
 
 ### Usage
@@ -47,12 +47,12 @@ iso primitives/if.dot c4_graphs/stmt.dot
 SUB:
 * [if.dot](testdata/primitives/if.dot):
 
-![if.dot subgraph](https://raw.githubusercontent.com/mewrev/graphs/master/testdata/primitives/if.png)
+![if.dot subgraph](https://raw.githubusercontent.com/decomp/graphs/master/testdata/primitives/if.png)
 
 GRAPH:
 * [stmt.dot](testdata/c4_graphs/stmt.dot):
 
-![stmt.dot graph](https://raw.githubusercontent.com/mewrev/graphs/master/testdata/c4_graphs/stmt.png)
+![stmt.dot graph](https://raw.githubusercontent.com/decomp/graphs/master/testdata/c4_graphs/stmt.png)
 
 ## Public domain
 

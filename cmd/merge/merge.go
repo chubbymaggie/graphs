@@ -16,12 +16,12 @@ import (
 	"os/exec"
 	"sort"
 
+	"github.com/decomp/graphs"
+	"github.com/decomp/graphs/iso"
+	"github.com/decomp/graphs/merge"
 	"github.com/mewfork/dot"
 	"github.com/mewkiz/pkg/errutil"
 	"github.com/mewkiz/pkg/pathutil"
-	"github.com/mewrev/graphs"
-	"github.com/mewrev/graphs/iso"
-	"github.com/mewrev/graphs/merge"
 )
 
 var (

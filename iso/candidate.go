@@ -3,9 +3,9 @@ package iso
 import (
 	"fmt"
 
+	"github.com/decomp/graphs"
 	"github.com/mewfork/dot"
 	"github.com/mewkiz/pkg/errutil"
-	"github.com/mewrev/graphs"
 )
 
 // Equation specifies an equation of node pair candidates and known node pairs.

@@ -4,8 +4,8 @@ package iso
 import (
 	"sort"
 
+	"github.com/decomp/graphs"
 	"github.com/mewfork/dot"
-	"github.com/mewrev/graphs"
 )
 
 // Isomorphism returns a mapping from sub node name to graph node name if there

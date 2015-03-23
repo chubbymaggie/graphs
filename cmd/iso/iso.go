@@ -13,10 +13,10 @@ import (
 	"os"
 	"sort"
 
+	"github.com/decomp/graphs"
+	"github.com/decomp/graphs/iso"
 	"github.com/mewfork/dot"
 	"github.com/mewkiz/pkg/errutil"
-	"github.com/mewrev/graphs"
-	"github.com/mewrev/graphs/iso"
 )
 
 // When flagStart is a non-empty string, locate an isomorphism of the subgraph
