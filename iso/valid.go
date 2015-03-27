@@ -21,6 +21,19 @@ func (eq *Equation) IsValid(graph *dot.Graph, sub *graphs.SubGraph) bool {
 		return false
 	}
 
+	// Verify that the entry node dominates the exit node.
+	entry, ok := graph.Nodes.Lookup[eq.m[sub.Entry()]]
+	if !ok {
+		return false
+	}
+	exit, ok := graph.Nodes.Lookup[eq.m[sub.Exit()]]
+	if !ok {
+		return false
+	}
+	if !entry.Dominates(exit) {
+		return false
+	}
+
 	// Sort keys to make the algorithm deterministic.
 	var snames []string
 	for sname := range eq.m {
