@@ -1,0 +1,4 @@
+digraph inf_loop {
+	A [label="entry"]
+	A->A
+}
