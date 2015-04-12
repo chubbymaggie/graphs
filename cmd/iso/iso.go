@@ -11,12 +11,15 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"sort"
 
 	"decomp.org/x/graphs"
 	"decomp.org/x/graphs/iso"
 	"github.com/mewfork/dot"
 	"github.com/mewkiz/pkg/errutil"
+	"github.com/mewkiz/pkg/goutil"
+	"github.com/mewkiz/pkg/osutil"
 )
 
 // When flagStart is a non-empty string, locate an isomorphism of the subgraph
@@ -55,10 +58,19 @@ func main() {
 // locate parses the provided graphs and tries to locate isomorphisms of the
 // subgraph in the graph.
 func locate(graphPath, subPath string) error {
-	// Parse graphs.
+	// Parse graph.
 	graph, err := dot.ParseFile(graphPath)
 	if err != nil {
 		return errutil.Err(err)
+	}
+
+	// Search for subgraph in GOPATH if not found.
+	if ok, _ := osutil.Exists(subPath); !ok {
+		dir, err := goutil.SrcDir("decomp.org/x/graphs/testdata/primitives")
+		if err != nil {
+			return errutil.Err(err)
+		}
+		subPath = filepath.Join(dir, subPath)
 	}
 	sub, err := graphs.ParseSubGraph(subPath)
 	if err != nil {

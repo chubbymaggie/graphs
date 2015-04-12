@@ -14,6 +14,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"sort"
 
 	"decomp.org/x/graphs"
@@ -21,6 +22,8 @@ import (
 	"decomp.org/x/graphs/merge"
 	"github.com/mewfork/dot"
 	"github.com/mewkiz/pkg/errutil"
+	"github.com/mewkiz/pkg/goutil"
+	"github.com/mewkiz/pkg/osutil"
 	"github.com/mewkiz/pkg/pathutil"
 )
 
@@ -71,10 +74,19 @@ func main() {
 // locateAndMerge parses the provided graphs and tries to merge isomorphisms of
 // the subgraph in the graph into single nodes.
 func locateAndMerge(graphPath, subPath string) error {
-	// Parse graphs.
+	// Parse graph.
 	graph, err := dot.ParseFile(graphPath)
 	if err != nil {
 		return errutil.Err(err)
+	}
+
+	// Search for subgraph in GOPATH if not found.
+	if ok, _ := osutil.Exists(subPath); !ok {
+		dir, err := goutil.SrcDir("decomp.org/x/graphs/testdata/primitives")
+		if err != nil {
+			return errutil.Err(err)
+		}
+		subPath = filepath.Join(dir, subPath)
 	}
 	sub, err := graphs.ParseSubGraph(subPath)
 	if err != nil {
