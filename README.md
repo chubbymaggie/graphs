@@ -8,7 +8,7 @@ This project is a *work in progress*. The implementation is *incomplete* and sub
 [![Coverage Status](https://img.shields.io/coveralls/decomp/graphs.svg)](https://coveralls.io/r/decomp/graphs?branch=master)
 [![GoDoc](https://godoc.org/decomp.org/x/graphs?status.svg)](https://godoc.org/decomp.org/x/graphs)
 
-The graphs project implements subgraph isomorphism search algorithms.
+The graphs project provides subgraph isomorphism search algorithms and related tools.
 
 ## cmd/iso
 
