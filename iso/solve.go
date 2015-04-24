@@ -7,10 +7,10 @@ import (
 	"github.com/mewkiz/pkg/errutil"
 )
 
-// SetPair marks the given node pair as known by removing it from c and storing
+// setPair marks the given node pair as known by removing it from c and storing
 // it in m. As the graph node name is no longer a valid candidate it is removed
 // from all other node pairs in c.
-func (eq *Equation) SetPair(sname, gname string) error {
+func (eq *equation) setPair(sname, gname string) error {
 	// Sanity check.
 	if key, ok := findKey(eq.m, gname); ok {
 		return errutil.Newf("invalid mapping; sub node %q and %q both map to graph node %q", key, sname, gname)
@@ -43,8 +43,8 @@ func findKey(m map[string]string, val string) (key string, ok bool) {
 	return "", false
 }
 
-// Dup returns a copy of eq.
-func (eq *Equation) Dup() *Equation {
+// dup returns a copy of eq.
+func (eq *equation) dup() *equation {
 	// Duplicate node pair candidates.
 	c := make(map[string]map[string]bool)
 	for sname, candidates := range eq.c {
@@ -60,14 +60,14 @@ func (eq *Equation) Dup() *Equation {
 		m[sname] = gname
 	}
 
-	return &Equation{c: c, m: m}
+	return &equation{c: c, m: m}
 }
 
-// SolveUnique tries to locate a unique node pair in c. If successful the node
+// solveUnique tries to locate a unique node pair in c. If successful the node
 // pair is removed from c and stored in m. As the graph node name of the node
 // pair is no longer a valid candidate it is removed from all other node pairs
 // in c.
-func (eq *Equation) SolveUnique() (ok bool, err error) {
+func (eq *equation) solveUnique() (ok bool, err error) {
 	// Sort keys to make the algorithm deterministic.
 	var snames []string
 	for sname := range eq.c {
@@ -79,7 +79,7 @@ func (eq *Equation) SolveUnique() (ok bool, err error) {
 		candidates := eq.c[sname]
 		if len(candidates) == 1 {
 			gname := firstKey(candidates)
-			err := eq.SetPair(sname, gname)
+			err := eq.setPair(sname, gname)
 			if err != nil {
 				return false, errutil.Err(err)
 			}

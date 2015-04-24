@@ -8,12 +8,12 @@ import (
 	"github.com/mewkiz/pkg/errutil"
 )
 
-// SolveBrute tries to solve the node pair equation through brute force. It
+// solveBrute tries to solve the node pair equation through brute force. It
 // recursively locates and attempts to solve the easiest node pair (i.e. the one
 // with the fewest number of candidates) until the equation is solved, or until
 // all potential solutions have been exhausted.
-func (eq *Equation) SolveBrute(graph *dot.Graph, sub *graphs.SubGraph) (m map[string]string, err error) {
-	if eq.IsValid(graph, sub) {
+func (eq *equation) solveBrute(graph *dot.Graph, sub *graphs.SubGraph) (m map[string]string, err error) {
+	if eq.isValid(graph, sub) {
 		return eq.m, nil
 	}
 	sname, err := eq.easiest()
@@ -29,12 +29,12 @@ func (eq *Equation) SolveBrute(graph *dot.Graph, sub *graphs.SubGraph) (m map[st
 	sort.Strings(candidates)
 
 	for _, gname := range candidates {
-		dup := eq.Dup()
-		err = dup.SetPair(sname, gname)
+		dup := eq.dup()
+		err = dup.setPair(sname, gname)
 		if err != nil {
 			continue
 		}
-		m, err := dup.SolveBrute(graph, sub)
+		m, err := dup.solveBrute(graph, sub)
 		if err != nil {
 			continue
 		}
@@ -46,7 +46,7 @@ func (eq *Equation) SolveBrute(graph *dot.Graph, sub *graphs.SubGraph) (m map[st
 
 // easiest returns the sub node name of the easiest node pair (i.e. the one with
 // the fewest number of candidates) to solve.
-func (eq *Equation) easiest() (string, error) {
+func (eq *equation) easiest() (string, error) {
 	// Sort keys to make the algorithm deterministic.
 	var snames []string
 	for sname := range eq.c {

@@ -154,7 +154,7 @@ func TestCandidates(t *testing.T) {
 			t.Errorf("i=%d: %v", i, err)
 			continue
 		}
-		eq, err := Candidates(graph, g.entry, sub)
+		eq, err := candidates(graph, g.entry, sub)
 		if !sameError(err, g.err) {
 			t.Errorf("i=%d: error mismatch; expected %v, got %v", i, g.err, err)
 			continue
@@ -253,12 +253,12 @@ loop:
 			t.Errorf("i=%d: %v", i, err)
 			continue
 		}
-		eq, err := Candidates(graph, g.entry, sub)
+		eq, err := candidates(graph, g.entry, sub)
 		if err != nil {
 			t.Errorf("i=%d: %v", i, err)
 			continue
 		}
-		m, err := eq.SolveBrute(graph, sub)
+		m, err := eq.solveBrute(graph, sub)
 		if !sameError(err, g.err) {
 			t.Errorf("i=%d: error mismatch; expected %v, got %v", i, g.err, err)
 			continue
@@ -277,14 +277,14 @@ loop:
 
 func TestEquationSetPair(t *testing.T) {
 	golden := []struct {
-		in           *Equation
+		in           *equation
 		sname, gname string
-		want         *Equation
+		want         *equation
 		err          string
 	}{
 		// i=0
 		{
-			in: &Equation{
+			in: &equation{
 				c: map[string]map[string]bool{
 					"A": {
 						"A": true,
@@ -304,7 +304,7 @@ func TestEquationSetPair(t *testing.T) {
 				m: map[string]string{},
 			},
 			sname: "A", gname: "A",
-			want: &Equation{
+			want: &equation{
 				c: map[string]map[string]bool{
 					"B": {
 						"B": true,
@@ -326,7 +326,7 @@ func TestEquationSetPair(t *testing.T) {
 		},
 		// i=1
 		{
-			in: &Equation{
+			in: &equation{
 				c: map[string]map[string]bool{
 					"B": {
 						"B": true,
@@ -345,7 +345,7 @@ func TestEquationSetPair(t *testing.T) {
 				},
 			},
 			sname: "B", gname: "B",
-			want: &Equation{
+			want: &equation{
 				c: map[string]map[string]bool{
 					"C": {
 						"C": true,
@@ -363,7 +363,7 @@ func TestEquationSetPair(t *testing.T) {
 		},
 		// i=2
 		{
-			in: &Equation{
+			in: &equation{
 				c: map[string]map[string]bool{
 					"B": {
 						"B": true,
@@ -382,7 +382,7 @@ func TestEquationSetPair(t *testing.T) {
 				},
 			},
 			sname: "B", gname: "C",
-			want: &Equation{
+			want: &equation{
 				c: map[string]map[string]bool{
 					"C": {
 						"B": true,
@@ -400,7 +400,7 @@ func TestEquationSetPair(t *testing.T) {
 		},
 		// i=3
 		{
-			in: &Equation{
+			in: &equation{
 				c: map[string]map[string]bool{
 					"A": {
 						"A": true,
@@ -422,7 +422,7 @@ func TestEquationSetPair(t *testing.T) {
 		},
 		// i=3
 		{
-			in: &Equation{
+			in: &equation{
 				c: map[string]map[string]bool{
 					"A": {
 						"0": true,
@@ -440,7 +440,7 @@ func TestEquationSetPair(t *testing.T) {
 	}
 
 	for i, g := range golden {
-		err := g.in.SetPair(g.sname, g.gname)
+		err := g.in.setPair(g.sname, g.gname)
 		if !sameError(err, g.err) {
 			t.Errorf("i=%d: error mismatch; expected %v, got %v", i, g.err, err)
 			continue
@@ -456,13 +456,13 @@ func TestEquationSetPair(t *testing.T) {
 
 func TestEquationDup(t *testing.T) {
 	golden := []struct {
-		in         *Equation
+		in         *equation
 		ckey, mkey string
-		want       *Equation
+		want       *equation
 	}{
 		// i=0
 		{
-			in: &Equation{
+			in: &equation{
 				c: map[string]map[string]bool{
 					"A": {
 						"A": true,
@@ -482,7 +482,7 @@ func TestEquationDup(t *testing.T) {
 				},
 			},
 			ckey: "A", mkey: "D",
-			want: &Equation{
+			want: &equation{
 				c: map[string]map[string]bool{
 					"B": {
 						"B": true,
@@ -500,7 +500,7 @@ func TestEquationDup(t *testing.T) {
 		},
 		// i=1
 		{
-			in: &Equation{
+			in: &equation{
 				c: map[string]map[string]bool{
 					"B": {
 						"B": true,
@@ -518,7 +518,7 @@ func TestEquationDup(t *testing.T) {
 				},
 			},
 			ckey: "B", mkey: "E",
-			want: &Equation{
+			want: &equation{
 				c: map[string]map[string]bool{
 					"C": {
 						"B": true,
@@ -534,7 +534,7 @@ func TestEquationDup(t *testing.T) {
 	}
 
 	for i, g := range golden {
-		got := g.in.Dup()
+		got := g.in.dup()
 		if !reflect.DeepEqual(got, g.in) {
 			t.Errorf("i=%d: equation copy differs from original; expected %v, got %v", i, g.in, got)
 			continue
@@ -555,14 +555,14 @@ func TestEquationDup(t *testing.T) {
 
 func TestEquationSolveUnique(t *testing.T) {
 	golden := []struct {
-		in   *Equation
-		want *Equation
+		in   *equation
+		want *equation
 		ok   bool
 		err  string
 	}{
 		// i=0
 		{
-			in: &Equation{
+			in: &equation{
 				c: map[string]map[string]bool{
 					"A": {
 						"A": true,
@@ -581,7 +581,7 @@ func TestEquationSolveUnique(t *testing.T) {
 					"E": "E",
 				},
 			},
-			want: &Equation{
+			want: &equation{
 				c: map[string]map[string]bool{
 					"B": {
 						"B": true,
@@ -603,7 +603,7 @@ func TestEquationSolveUnique(t *testing.T) {
 		},
 		// i=1
 		{
-			in: &Equation{
+			in: &equation{
 				c: map[string]map[string]bool{
 					"A": {
 						"A": true,
@@ -625,7 +625,7 @@ func TestEquationSolveUnique(t *testing.T) {
 				},
 				m: map[string]string{},
 			},
-			want: &Equation{
+			want: &equation{
 				c: map[string]map[string]bool{
 					"B": {
 						"B": true,
@@ -651,7 +651,7 @@ func TestEquationSolveUnique(t *testing.T) {
 		},
 		// i=2
 		{
-			in: &Equation{
+			in: &equation{
 				c: map[string]map[string]bool{
 					"B": {
 						"B": true,
@@ -672,7 +672,7 @@ func TestEquationSolveUnique(t *testing.T) {
 					"A": "A",
 				},
 			},
-			want: &Equation{
+			want: &equation{
 				c: map[string]map[string]bool{
 					"B": {
 						"B": true,
@@ -696,7 +696,7 @@ func TestEquationSolveUnique(t *testing.T) {
 		},
 		// i=3
 		{
-			in: &Equation{
+			in: &equation{
 				c: map[string]map[string]bool{
 					"B": {
 						"B": true,
@@ -715,7 +715,7 @@ func TestEquationSolveUnique(t *testing.T) {
 					"D": "D",
 				},
 			},
-			want: &Equation{
+			want: &equation{
 				c: map[string]map[string]bool{
 					"B": {
 						"B": true,
@@ -737,7 +737,7 @@ func TestEquationSolveUnique(t *testing.T) {
 		},
 		// i=4
 		{
-			in: &Equation{
+			in: &equation{
 				c: map[string]map[string]bool{
 					"B": {
 						"B": true,
@@ -754,7 +754,7 @@ func TestEquationSolveUnique(t *testing.T) {
 					"E": "E",
 				},
 			},
-			want: &Equation{
+			want: &equation{
 				c: map[string]map[string]bool{
 					"B": {
 						"B": true,
@@ -776,7 +776,7 @@ func TestEquationSolveUnique(t *testing.T) {
 		},
 		// i=5
 		{
-			in: &Equation{
+			in: &equation{
 				c: map[string]map[string]bool{
 					"B": {
 						"0": true,
@@ -799,7 +799,7 @@ func TestEquationSolveUnique(t *testing.T) {
 	}
 
 	for i, g := range golden {
-		ok, err := g.in.SolveUnique()
+		ok, err := g.in.solveUnique()
 		if !sameError(err, g.err) {
 			t.Errorf("i=%d: error mismatch; expected %v, got %v", i, g.err, err)
 			continue
@@ -821,14 +821,14 @@ func TestEquationIsValid(t *testing.T) {
 	golden := []struct {
 		subPath   string
 		graphPath string
-		eq        *Equation
+		eq        *equation
 		want      bool
 	}{
 		// i=0
 		{
 			subPath:   "../testdata/primitives/if.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
-			eq: &Equation{
+			eq: &equation{
 				m: map[string]string{
 					"A": "71",
 					"B": "74",
@@ -841,7 +841,7 @@ func TestEquationIsValid(t *testing.T) {
 		{
 			subPath:   "../testdata/primitives/if.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
-			eq: &Equation{
+			eq: &equation{
 				m: map[string]string{
 					"A": "17",
 					"B": "24",
@@ -854,7 +854,7 @@ func TestEquationIsValid(t *testing.T) {
 		{
 			subPath:   "../testdata/primitives/if.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
-			eq: &Equation{
+			eq: &equation{
 				m: map[string]string{
 					"A": "89",
 					"B": "92",
@@ -867,7 +867,7 @@ func TestEquationIsValid(t *testing.T) {
 		{
 			subPath:   "../testdata/primitives/if.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
-			eq: &Equation{
+			eq: &equation{
 				m: map[string]string{
 					"A": "94",
 					"B": "97",
@@ -880,7 +880,7 @@ func TestEquationIsValid(t *testing.T) {
 		{
 			subPath:   "../testdata/primitives/if_else.dot",
 			graphPath: "../testdata/c4_graphs/expr.dot",
-			eq: &Equation{
+			eq: &equation{
 				m: map[string]string{
 					"A": "282",
 					"B": "292",
@@ -894,7 +894,7 @@ func TestEquationIsValid(t *testing.T) {
 		{
 			subPath:   "../testdata/primitives/if_else.dot",
 			graphPath: "../testdata/c4_graphs/expr.dot",
-			eq: &Equation{
+			eq: &equation{
 				m: map[string]string{
 					"A": "282",
 					"B": "287",
@@ -908,7 +908,7 @@ func TestEquationIsValid(t *testing.T) {
 		{
 			subPath:   "../testdata/primitives/if_else.dot",
 			graphPath: "../testdata/c4_graphs/next.dot",
-			eq: &Equation{
+			eq: &equation{
 				m: map[string]string{
 					"A": "438",
 					"B": "446",
@@ -922,7 +922,7 @@ func TestEquationIsValid(t *testing.T) {
 		{
 			subPath:   "../testdata/primitives/if_else.dot",
 			graphPath: "../testdata/c4_graphs/next.dot",
-			eq: &Equation{
+			eq: &equation{
 				m: map[string]string{
 					"A": "438",
 					"B": "443",
@@ -936,7 +936,7 @@ func TestEquationIsValid(t *testing.T) {
 		{
 			subPath:   "../testdata/primitives/if_else.dot",
 			graphPath: "../testdata/c4_graphs/next.dot",
-			eq: &Equation{
+			eq: &equation{
 				m: map[string]string{
 					"A": "487",
 					"B": "492",
@@ -950,7 +950,7 @@ func TestEquationIsValid(t *testing.T) {
 		{
 			subPath:   "../testdata/primitives/if_else.dot",
 			graphPath: "../testdata/c4_graphs/next.dot",
-			eq: &Equation{
+			eq: &equation{
 				m: map[string]string{
 					"A": "487",
 					"B": "495",
@@ -964,7 +964,7 @@ func TestEquationIsValid(t *testing.T) {
 		{
 			subPath:   "../testdata/primitives/if_else.dot",
 			graphPath: "../testdata/c4_graphs/next.dot",
-			eq: &Equation{
+			eq: &equation{
 				m: map[string]string{
 					"A": "124",
 					"B": "134",
@@ -978,7 +978,7 @@ func TestEquationIsValid(t *testing.T) {
 		{
 			subPath:   "../testdata/primitives/list.dot",
 			graphPath: "../testdata/c4_graphs/main.dot",
-			eq: &Equation{
+			eq: &equation{
 				m: map[string]string{
 					"A": "740",
 					"B": "760",
@@ -990,7 +990,7 @@ func TestEquationIsValid(t *testing.T) {
 		{
 			subPath:   "../testdata/primitives/list.dot",
 			graphPath: "../testdata/c4_graphs/main.dot",
-			eq: &Equation{
+			eq: &equation{
 				m: map[string]string{
 					"A": "761",
 					"B": "762",
@@ -1002,7 +1002,7 @@ func TestEquationIsValid(t *testing.T) {
 		{
 			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/expr.dot",
-			eq: &Equation{
+			eq: &equation{
 				m: map[string]string{
 					"A": "191",
 					"B": "194",
@@ -1015,7 +1015,7 @@ func TestEquationIsValid(t *testing.T) {
 		{
 			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/expr.dot",
-			eq: &Equation{
+			eq: &equation{
 				m: map[string]string{
 					"A": "370",
 					"B": "378",
@@ -1028,7 +1028,7 @@ func TestEquationIsValid(t *testing.T) {
 		{
 			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/expr.dot",
-			eq: &Equation{
+			eq: &equation{
 				m: map[string]string{
 					"A": "526",
 					"B": "530",
@@ -1041,7 +1041,7 @@ func TestEquationIsValid(t *testing.T) {
 		{
 			subPath:   "../testdata/primitives/if_else.dot",
 			graphPath: "../testdata/c4_graphs/expr.dot",
-			eq: &Equation{
+			eq: &equation{
 				m: map[string]string{
 					"A": "611",
 					"B": "615",
@@ -1055,7 +1055,7 @@ func TestEquationIsValid(t *testing.T) {
 		{
 			subPath:   "../testdata/primitives/if_else.dot",
 			graphPath: "../testdata/c4_graphs/expr.dot",
-			eq: &Equation{
+			eq: &equation{
 				m: map[string]string{
 					"A": "611",
 					"B": "615",
@@ -1068,7 +1068,7 @@ func TestEquationIsValid(t *testing.T) {
 		{
 			subPath:   "../testdata/primitives/if.dot",
 			graphPath: "../testdata/c4_graphs/main.dot",
-			eq: &Equation{
+			eq: &equation{
 				m: map[string]string{
 					"A": "20",
 					"B": "25",
@@ -1081,7 +1081,7 @@ func TestEquationIsValid(t *testing.T) {
 		{
 			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
-			eq: &Equation{
+			eq: &equation{
 				m: map[string]string{
 					"A": "39", // 48
 					"B": "44",
@@ -1094,7 +1094,7 @@ func TestEquationIsValid(t *testing.T) {
 		{
 			subPath:   "../testdata/primitives/pre_loop.dot",
 			graphPath: "../testdata/c4_graphs/stmt.dot",
-			eq: &Equation{
+			eq: &equation{
 				m: map[string]string{
 					"A": "39",
 					"B": "44",
@@ -1116,7 +1116,7 @@ func TestEquationIsValid(t *testing.T) {
 			t.Errorf("i=%d: %v", i, err)
 			continue
 		}
-		got := g.eq.IsValid(graph, sub)
+		got := g.eq.isValid(graph, sub)
 		if got != g.want {
 			t.Errorf("i=%d: ok mismatch; expected %v, got %v", i, g.want, got)
 			continue

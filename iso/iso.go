@@ -13,11 +13,11 @@ import (
 // boolean value is true if such a mapping could be located, and false
 // otherwise.
 func Isomorphism(graph *dot.Graph, entry string, sub *graphs.SubGraph) (m map[string]string, ok bool) {
-	eq, err := Candidates(graph, entry, sub)
+	eq, err := candidates(graph, entry, sub)
 	if err != nil {
 		return nil, false
 	}
-	m, err = eq.SolveBrute(graph, sub)
+	m, err = eq.solveBrute(graph, sub)
 	if err != nil {
 		return nil, false
 	}

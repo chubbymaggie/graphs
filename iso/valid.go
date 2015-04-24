@@ -8,10 +8,10 @@ import (
 	"github.com/mewfork/dot"
 )
 
-// IsValid returns true if m is a valid mapping, from sub node name to graph
+// isValid returns true if m is a valid mapping, from sub node name to graph
 // node name, for an isomorphism of sub in graph considering all nodes and edges
 // except predecessors of entry and successors of exit.
-func (eq *Equation) IsValid(graph *dot.Graph, sub *graphs.SubGraph) bool {
+func (eq *equation) isValid(graph *dot.Graph, sub *graphs.SubGraph) bool {
 	if len(eq.m) != len(sub.Nodes.Nodes) {
 		return false
 	}

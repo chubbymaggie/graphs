@@ -9,16 +9,16 @@ import (
 )
 
 // Equation specifies an equation of node pair candidates and known node pairs.
-type Equation struct {
+type equation struct {
 	// mapping from sub node name to graph node name candidates.
 	c map[string]map[string]bool
 	// mapping from sub node name to graph node name.
 	m map[string]string
 }
 
-// Candidates locates node pair candidates for an isomorphism of sub in graph
+// candidates locates node pair candidates for an isomorphism of sub in graph
 // which starts at the entry node.
-func Candidates(graph *dot.Graph, entry string, sub *graphs.SubGraph) (*Equation, error) {
+func candidates(graph *dot.Graph, entry string, sub *graphs.SubGraph) (*equation, error) {
 	// Sanity checks.
 	g, ok := graph.Nodes.Lookup[entry]
 	if !ok {
@@ -33,7 +33,7 @@ func Candidates(graph *dot.Graph, entry string, sub *graphs.SubGraph) (*Equation
 	}
 
 	// Locate candidate node pairs.
-	eq := &Equation{
+	eq := &equation{
 		c: make(map[string]map[string]bool),
 		m: make(map[string]string),
 	}
@@ -47,7 +47,7 @@ func Candidates(graph *dot.Graph, entry string, sub *graphs.SubGraph) (*Equation
 
 // findCandidates recursively locates potential node pairs (g and s) for an
 // isomorphism of sub in graph and adds them to c.
-func (eq *Equation) findCandidates(g, s *dot.Node, sub *graphs.SubGraph) {
+func (eq *equation) findCandidates(g, s *dot.Node, sub *graphs.SubGraph) {
 	// Exit early for impossible node pairs.
 	if !isPotential(g, s, sub) {
 		return
